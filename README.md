@@ -38,3 +38,8 @@ to `propext`, `Classical.choice`, and `Quot.sound`. The proof dependency audit
 also checks that the two renorming results use the paper's elementary
 sparse-trace argument. The final command replays the declarations in a fresh
 kernel environment. [Lean proof validation](https://lean-lang.org/doc/reference/latest/ValidatingProofs/)
+
+## License
+
+The Lean formalization is available under the
+[Apache License, Version 2.0](LICENSE).
