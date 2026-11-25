@@ -134,32 +134,6 @@ theorem recursiveBoundedValue_eq_boundedValue {arity : ℕ}
       simp only [recursiveBoundedValue, boundedValue, realValue,
         clampTruthValue_max, leftInduction, rightInduction]
 
-/-- Substitute rational formulae for the coordinates of a lattice code. -/
-def instantiate {Symbol : Type*} {arity : ℕ}
-    (code : RationalLatticeCode arity)
-    (inputs : Fin arity → RationalFormula Symbol) : RationalFormula Symbol :=
-  match code with
-  | .constant value => .constant value
-  | .affine coordinate bias slope =>
-      .affine₂ bias slope 0 (inputs coordinate) (.constant 0)
-  | .min left right => .min (left.instantiate inputs) (right.instantiate inputs)
-  | .max left right => .max (left.instantiate inputs) (right.instantiate inputs)
-
-/-- Substitution of well-formed formulae into a rational lattice code remains
-well formed. -/
-theorem wellFormed_instantiate {Symbol : Type*} {arity rowVars parameterVars : ℕ}
-    (code : RationalLatticeCode arity)
-    (inputs : Fin arity → RationalFormula Symbol)
-    (hinputs : ∀ coordinate,
-      (inputs coordinate).WellFormed rowVars parameterVars) :
-    (code.instantiate inputs).WellFormed rowVars parameterVars := by
-  induction code with
-  | constant value => trivial
-  | affine coordinate bias slope => exact ⟨hinputs coordinate, trivial⟩
-  | min left right leftInduction rightInduction =>
-      exact ⟨leftInduction, rightInduction⟩
-  | max left right leftInduction rightInduction =>
-      exact ⟨leftInduction, rightInduction⟩
 
 end RationalLatticeCode
 

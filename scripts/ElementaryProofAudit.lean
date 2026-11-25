@@ -68,8 +68,8 @@ run_cmd do
         ``NormFormula.ContinuousLogic.hilbert_sparse_norm_isBoundedLocalNIP] do
       unless state.visited.contains name do
         throwError "{root} does not use the required Hilbert--seminorm argument: {name}"
-    for name in #[``NormFormula.hilbertNormTranslate_isBoundedLocalNIP,
-        ``NormFormula.euclideanConnective_isBoundedLocalNIP] do
+    for name in #["NormFormula.hilbertNormTranslate_isBoundedLocalNIP".toName,
+        "NormFormula.euclideanConnective_isBoundedLocalNIP".toName] do
       if state.visited.contains name then
         throwError "{root} still depends on the supplementary quantitative proof: {name}"
   for (root, required) in #[

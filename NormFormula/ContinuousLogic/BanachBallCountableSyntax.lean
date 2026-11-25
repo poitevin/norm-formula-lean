@@ -181,59 +181,6 @@ def elaborate {Symbol : Type w} (symbolRadius : Symbol → ℚ≥0) :
 
 end RationalBallFormulaCode
 
-/-- Well-typed raw term codes at a fixed output radius. -/
-def CountableBallTerm {n : ℕ} (context : BallContext n) (radius : ℚ≥0) :=
-  {code : RawBallTerm //
-    ∃ term : BallTerm context radius,
-      code.elaborateAt context radius = some term}
-
-noncomputable instance {n : ℕ} (context : BallContext n) (radius : ℚ≥0) :
-    Countable (CountableBallTerm context radius) :=
-  Function.Injective.countable Subtype.val_injective
-
-namespace CountableBallTerm
-
-/-- The typed term denoted by a well-typed raw code. -/
-def toBallTerm {n : ℕ} {context : BallContext n} {radius : ℚ≥0}
-    (code : CountableBallTerm context radius) : BallTerm context radius :=
-  Classical.choose code.2
-
-/-- The selected typed term is indeed the elaboration of its raw code. -/
-theorem elaborateAt_toBallTerm
-    {n : ℕ} {context : BallContext n} {radius : ℚ≥0}
-    (code : CountableBallTerm context radius) :
-    code.1.elaborateAt context radius = some code.toBallTerm :=
-  Classical.choose_spec code.2
-
-/-- Every intrinsic typed term has a countable raw code. -/
-def ofBallTerm {n : ℕ} {context : BallContext n} {radius : ℚ≥0}
-    (term : BallTerm context radius) : CountableBallTerm context radius :=
-  ⟨RawBallTerm.ofBallTerm term, term,
-    RawBallTerm.elaborateAt_ofBallTerm term⟩
-
-@[simp]
-theorem toBallTerm_ofBallTerm
-    {n : ℕ} {context : BallContext n} {radius : ℚ≥0}
-    (term : BallTerm context radius) :
-    (ofBallTerm term).toBallTerm = term := by
-  have hselected := elaborateAt_toBallTerm (ofBallTerm term)
-  change RawBallTerm.elaborateAt context radius
-    (RawBallTerm.ofBallTerm term) = some (ofBallTerm term).toBallTerm at hselected
-  rw [RawBallTerm.elaborateAt_ofBallTerm] at hselected
-  exact Option.some.inj hselected.symm
-
-end CountableBallTerm
-
-/-- Intrinsically typed terms in any fixed finite radius context and output
-sort form a countable type. -/
-noncomputable instance ballTerm_countable
-    {n : ℕ} (context : BallContext n) (radius : ℚ≥0) :
-    Countable (BallTerm context radius) :=
-  Function.Surjective.countable
-    (f := CountableBallTerm.toBallTerm)
-    (fun term ↦ ⟨CountableBallTerm.ofBallTerm term,
-      CountableBallTerm.toBallTerm_ofBallTerm term⟩)
-
 /-- Well-typed rational formula codes in one fixed ball context. -/
 def CountableBallFormula (Symbol : Type w) (symbolRadius : Symbol → ℚ≥0)
     {n : ℕ} (context : BallContext n) :=
@@ -263,14 +210,6 @@ theorem elaborate_toBallFormula
     code.1.elaborate symbolRadius context = some code.toBallFormula :=
   Classical.choose_spec code.2
 
-/-- The image of the rational typed fragment is countable. -/
-theorem range_toBallFormula_countable
-    {Symbol : Type w} [Encodable Symbol]
-    (symbolRadius : Symbol → ℚ≥0) {n : ℕ} (context : BallContext n) :
-    (Set.range (toBallFormula :
-      CountableBallFormula Symbol symbolRadius context →
-        BallFormula Symbol symbolRadius context)).Countable :=
-  Set.countable_range _
 
 end CountableBallFormula
 

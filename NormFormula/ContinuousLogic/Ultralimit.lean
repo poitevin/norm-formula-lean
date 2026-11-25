@@ -41,10 +41,6 @@ theorem eventually_ge_indexUltrafilter (N : ℕ) :
     ∀ᶠ n in indexUltrafilter, N ≤ n :=
   eventually_indexUltrafilter_of_eventually_atTop (eventually_ge_atTop N)
 
-/-- No finite set belongs to the chosen ultrafilter. -/
-theorem finite_not_mem_indexUltrafilter {s : Set ℕ} (hs : s.Finite) :
-    s ∉ indexUltrafilter := by
-  exact hs.notMem_hyperfilter
 
 /-- The canonical ultralimit of a bounded truth-value sequence.  Compactness
 gives existence and Hausdorffness gives uniqueness. -/
@@ -64,13 +60,6 @@ theorem ultralimit_eq_of_tendsto {values : ℕ → TruthValue} {limit : TruthVal
     ultralimit values = limit :=
   tendsto_nhds_unique (tendsto_ultralimit values) hlimit
 
-/-- Changing a sequence on an ultrafilter-small set does not change its
-ultralimit. -/
-theorem ultralimit_congr {values values' : ℕ → TruthValue}
-    (h : values =ᶠ[indexUltrafilter] values') :
-    ultralimit values = ultralimit values' :=
-  tendsto_nhds_unique_of_eventuallyEq
-    (tendsto_ultralimit values) (tendsto_ultralimit values') h
 
 /-- The ultralimit of a constant sequence is that constant. -/
 @[simp]
@@ -78,13 +67,6 @@ theorem ultralimit_const (c : TruthValue) :
     ultralimit (fun _ : ℕ ↦ c) = c :=
   ultralimit_eq_of_tendsto tendsto_const_nhds
 
-/-- Ultralimits commute with continuous unary maps of truth values. -/
-theorem ultralimit_comp_continuous
-    (F : TruthValue → TruthValue) (hF : Continuous F)
-    (values : ℕ → TruthValue) :
-    ultralimit (fun n ↦ F (values n)) = F (ultralimit values) := by
-  apply ultralimit_eq_of_tendsto
-  exact hF.continuousAt.tendsto.comp (tendsto_ultralimit values)
 
 /-- An eventual real upper bound passes to the ultralimit. -/
 theorem ultralimit_coe_le_of_eventually_le

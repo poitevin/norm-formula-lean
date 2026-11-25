@@ -68,13 +68,6 @@ theorem normTranslate_hasIPPatternsInEveryDimension :
   intro i
   rw [norm_cubeRow]
 
-/-- Hence the stronger bounded finite-pattern NIP property fails for the
-direct sum, as expected from its complete-theory IP conclusion. -/
-theorem normTranslate_not_isBoundedLocalNIP :
-    ¬ IsBoundedLocalNIP normTranslate := by
-  intro hlocal
-  exact (hlocal.not_hasIPPatternsInEveryDimension X.sqrtThree_lt_sqrtSix)
-    normTranslate_hasIPPatternsInEveryDimension
 
 end
 

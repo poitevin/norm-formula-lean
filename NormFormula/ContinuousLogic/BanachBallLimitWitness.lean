@@ -52,19 +52,6 @@ def limitWitness [Encodable Symbol] (initial : BallWitnessIndexing M)
     (initial.iterate (initial.commonStage indices)).requested
       (initial.limitRequest formula indices precision direction)⟩
 
-@[simp]
-theorem limitMap_limitWitness [Encodable Symbol]
-    (initial : BallWitnessIndexing M)
-    {n : ℕ} {context : BallContext n} {radius : ℚ≥0}
-    (formula : CountableBallFormula Symbol symbolRadius
-      (Fin.cons radius context))
-    (indices : ∀ i : Fin n, initial.LimitIndex (context i))
-    (precision : ℕ) (direction : QuantifierDirection) :
-    initial.limitMap radius
-        (initial.limitWitness formula indices precision direction) =
-      (initial.limitRequest formula indices precision direction).witness
-        M (initial.iterate (initial.commonStage indices)).indexMap :=
-  rfl
 
 /-- Every rational ball-quantifier request over a limit assignment has a
 verified witness whose index belongs to the correct limit sort. -/

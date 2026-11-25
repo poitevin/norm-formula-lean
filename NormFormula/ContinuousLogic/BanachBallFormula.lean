@@ -34,12 +34,6 @@ def normalizedBallDistanceTruth (S : RationalBallSystem.{u}) (r : ℚ≥0)
     div_nonneg dist_nonneg (S.sortBound_pos r).le, ?_⟩
   exact (div_le_one (S.sortBound_pos r)).2 (S.dist_le_sortBound r x y)
 
-@[simp]
-theorem normalizedBallDistanceTruth_coe
-    (S : RationalBallSystem.{u}) (r : ℚ≥0) (x y : S.Ball r) :
-    (normalizedBallDistanceTruth S r x y : ℝ) =
-      dist x y / S.sortBound r :=
-  rfl
 
 /-- Normalized distance is uniformly continuous in both arguments. -/
 theorem normalizedBallDistanceTruth_uniformContinuous
@@ -137,16 +131,6 @@ theorem realize_connective {Symbol : Type w}
       connective fun i ↦ (formulas i).realize M assignment :=
   rfl
 
-@[simp]
-theorem realize_iSup {Symbol : Type w}
-    {symbolRadius : Symbol → ℚ≥0}
-    (M : BallStructure.{u, w} Symbol symbolRadius)
-    {n : ℕ} {context : BallContext n} (r : ℚ≥0)
-    (formula : BallFormula Symbol symbolRadius (Fin.cons r context))
-    (assignment : BallTerm.Assignment M.toRationalBallSystem context) :
-    (BallFormula.iSup r formula).realize M assignment =
-      ⨆ x : M.Ball r, formula.realize M (Fin.cons x assignment) :=
-  rfl
 
 @[simp]
 theorem realize_iInf {Symbol : Type w}

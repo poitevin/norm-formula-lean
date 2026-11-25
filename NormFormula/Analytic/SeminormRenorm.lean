@@ -82,9 +82,6 @@ theorem upper {C : ℝ} (hC : 0 ≤ C) (hp : ∀ x, p x ≤ C*‖x‖) (x : H) :
   have h := (sq_le_sq₀ (apply_nonneg p x) (mul_nonneg hC (norm_nonneg x))).mpr (hp x)
   nlinarith
 
-def continuousLinearEquiv {C : ℝ} (hC : 0 ≤ C) (hp : ∀ x, p x ≤ C*‖x‖) :
-    AugmentedSpace p ≃L[ℝ] H :=
-  SeminormRenorm.continuousLinearEquiv _ _ (Real.sqrt (1+C^2)) (upper p hC hp)
 end AugmentedSpace
 end
 end NormFormula

@@ -79,9 +79,6 @@ def lpCoordCLM (i : ι) : lp E 2 →L[ℝ] E i where
     rfl
   cont := (continuous_apply i).comp lp.uniformContinuous_coe.continuous
 
-@[simp]
-theorem lpCoordCLM_apply (i : ι) (f : lp E 2) : lpCoordCLM i f = f i :=
-  rfl
 
 /-- Weak convergence in the sum passes to weak convergence in every
 coordinate. -/
@@ -125,14 +122,6 @@ end L2Sum
 
 namespace X
 
-/-- Asymptotic Pythagoras specialized to the paper's renormed block sum
-`XSpace`. -/
-theorem tendsto_norm_add_sq_of_weaklyNull
-    (u : XSpace) {z : ℕ → XSpace} {C limit : ℝ}
-    (hzWeak : IsWeaklyNull z) (hzBounded : ∀ m, ‖z m‖ ≤ C)
-    (hzNorm : Tendsto (fun m ↦ ‖z m‖) atTop (𝓝 limit)) :
-    Tendsto (fun m ↦ ‖u + z m‖ ^ 2) atTop (𝓝 (‖u‖ ^ 2 + limit ^ 2)) :=
-  NormFormula.tendsto_norm_add_sq_of_weaklyNull u hzWeak hzBounded hzNorm
 
 end X
 

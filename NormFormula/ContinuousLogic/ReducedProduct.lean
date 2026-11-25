@@ -78,9 +78,6 @@ instance [Nonempty α] : Nonempty (ReducedSequence B) :=
 def sequenceDist (x y : ReducedSequence B) : ℝ :=
   (ultralimit fun n ↦ B.normalizedDistance (x n) (y n) : ℝ)
 
-theorem sequenceDist_nonneg (x y : ReducedSequence B) :
-    0 ≤ sequenceDist B x y :=
-  (ultralimit fun n ↦ B.normalizedDistance (x n) (y n)).property.1
 
 @[simp]
 theorem sequenceDist_self (x : ReducedSequence B) :
@@ -115,10 +112,6 @@ instance pseudoMetricSpace : PseudoMetricSpace (ReducedSequence B) where
   dist_comm := sequenceDist_comm B
   dist_triangle := sequenceDist_triangle B
 
-@[simp]
-theorem dist_eq_sequenceDist (x y : ReducedSequence B) :
-    dist x y = sequenceDist B x y :=
-  rfl
 
 /-- Normalized coordinate distances converge to the reduced sequence
 distance. -/
@@ -378,14 +371,6 @@ def Structure.reducedProduct : Structure.{u, v} where
   predicate := reducedPredicate M bounds
   predicate_uniformContinuous := reducedPredicate_uniformContinuous M bounds
 
-/-- The diagonal embedding preserves the distinguished predicate exactly. -/
-@[simp]
-theorem reducedProduct_predicate_const (x : M.Row) (y : M.Parameter) :
-    (M.reducedProduct bounds).predicate
-      (ReducedProduct.const bounds.row x)
-      (ReducedProduct.const bounds.parameter y) = M.predicate x y := by
-  change ultralimit (fun _ : ℕ ↦ M.predicate x y) = M.predicate x y
-  exact ultralimit_const (M.predicate x y)
 
 end
 

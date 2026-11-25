@@ -73,16 +73,6 @@ element of the weak-star dual. -/
 def rieszWeakDual (x : XHilbertSpace) : WeakDual ℝ XHilbertSpace :=
   StrongDual.toWeakDual (InnerProductSpace.toDual ℝ XHilbertSpace x)
 
-@[simp]
-theorem rieszWeakDual_apply (x y : XHilbertSpace) :
-    rieszWeakDual x y = inner ℝ x y :=
-  rfl
-
-@[simp]
-theorem toStrongDual_rieszWeakDual (x : XHilbertSpace) :
-    WeakDual.toStrongDual (rieszWeakDual x) =
-      InnerProductSpace.toDual ℝ XHilbertSpace x := by
-  rfl
 
 /-- Every bounded sequence in the Hilbert model has a weakly convergent
 subsequence.  This is sequential Banach--Alaoglu transported through the
@@ -141,17 +131,6 @@ theorem weakSequentialCompactnessOnBounded :
   simpa [Function.comp_def, continuousLinearEquivHilbertSum,
     linearEquivHilbertSum] using hm
 
-/-- The two iterated norm limits for bounded sequences in `XSpace` agree,
-with no remaining functional-analytic hypothesis. -/
-theorem iterated_norm_limits_eq
-    {xSeq ySeq : ℕ → XSpace} {Cx Cy firstLimit secondLimit : ℝ}
-    (hxBounded : ∀ m, ‖xSeq m‖ ≤ Cx)
-    (hyBounded : ∀ n, ‖ySeq n‖ ≤ Cy)
-    (hFirst : HasSuccessiveLimit (fun m n ↦ ‖xSeq m + ySeq n‖) firstLimit)
-    (hSecond : HasSuccessiveLimit (fun n m ↦ ‖xSeq m + ySeq n‖) secondLimit) :
-    firstLimit = secondLimit :=
-  iterated_norm_limits_eq_of_weakSequentialCompactness
-    weakSequentialCompactnessOnBounded hxBounded hyBounded hFirst hSecond
 
 end
 

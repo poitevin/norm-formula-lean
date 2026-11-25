@@ -30,15 +30,6 @@ def HasBoundedInfiniteIPWitness
 
 namespace HasBoundedInfiniteIPWitness
 
-/-- Infinite IP witnesses depend only on the pointwise interpretation. -/
-theorem congr
-    {X Y : Type*} [Norm X] [Norm Y]
-    {value value' : X → Y → ℝ} {R_x R_y low high : ℝ}
-    (h : HasBoundedInfiniteIPWitness value R_x R_y low high)
-    (hvalue : value = value') :
-    HasBoundedInfiniteIPWitness value' R_x R_y low high := by
-  subst value'
-  exact h
 
 end HasBoundedInfiniteIPWitness
 
@@ -62,43 +53,9 @@ namespace SeparableIPModelSemantics
 variable {X : Type u} {W : Type v} [Norm X]
 variable [NormedAddCommGroup W] [NormedSpace ℝ W] [CompleteSpace W]
 
-/-- The exact continuous-compactness and downward-Löwenheim--Skolem
-obligation for one named formula, one fixed choice of bounds and thresholds,
-and the particular extracted model `W`.
-
-Keeping this proposition formula-specific matches the manuscript: `W` is
-chosen only after the norm formula and its fixed cube patterns have been
-specified. -/
-def ExtractsSeparableIPModel
-    (S : SeparableIPModelSemantics X W) (φ : S.Formula)
-    (R_x R_y low high : ℝ) : Prop :=
-    low < high →
-    HasIPPatternsInEveryDimension
-      (S.homeValue φ) R_x R_y low high →
-    S.IsModelOfHomeTheory ∧
-      TopologicalSpace.IsSeparable (Set.univ : Set W) ∧
-      HasBoundedInfiniteIPWitness
-        (S.modelValue φ) R_x R_y low high
 
 variable (S : SeparableIPModelSemantics X W)
 
-/-- A convenient form allowing the home and extracted-model interpretations
-to be named separately from the abstract formula token. -/
-theorem extract_of_value_eq_of_finitePatterns
-    (φ : S.Formula)
-    (homeValue : X → X → ℝ) (modelValue : W → W → ℝ)
-    (hhome : S.homeValue φ = homeValue)
-    (hmodel : S.modelValue φ = modelValue)
-    (R_x R_y low high : ℝ)
-    (hextract : S.ExtractsSeparableIPModel φ R_x R_y low high)
-    (hgap : low < high)
-    (hpatterns : HasIPPatternsInEveryDimension
-      homeValue R_x R_y low high) :
-    S.IsModelOfHomeTheory ∧
-      TopologicalSpace.IsSeparable (Set.univ : Set W) ∧
-      HasBoundedInfiniteIPWitness modelValue R_x R_y low high := by
-  have h := hextract hgap (by simpa [hhome] using hpatterns)
-  exact ⟨h.1, h.2.1, h.2.2.congr hmodel⟩
 
 end SeparableIPModelSemantics
 

@@ -37,14 +37,6 @@ theorem ultralimitAlong_eq_of_tendsto {ι : Type κ} {U : Ultrafilter ι}
     ultralimitAlong U values = limit :=
   tendsto_nhds_unique (tendsto_ultralimitAlong U values) hlimit
 
-/-- Eventual equality preserves an arbitrary-index ultralimit. -/
-theorem ultralimitAlong_congr {ι : Type κ} {U : Ultrafilter ι}
-    {values values' : ι → TruthValue}
-    (h : values =ᶠ[U] values') :
-    ultralimitAlong U values = ultralimitAlong U values' :=
-  tendsto_nhds_unique_of_eventuallyEq
-    (tendsto_ultralimitAlong U values)
-    (tendsto_ultralimitAlong U values') h
 
 /-- The ultralimit of a constant family is constant. -/
 @[simp]
@@ -53,14 +45,6 @@ theorem ultralimitAlong_const {ι : Type κ} (U : Ultrafilter ι)
     ultralimitAlong U (fun _ : ι ↦ c) = c :=
   ultralimitAlong_eq_of_tendsto tendsto_const_nhds
 
-/-- Arbitrary-index ultralimits commute with continuous unary maps. -/
-theorem ultralimitAlong_comp_continuous {ι : Type κ}
-    (U : Ultrafilter ι) (F : TruthValue → TruthValue)
-    (hF : Continuous F) (values : ι → TruthValue) :
-    ultralimitAlong U (fun i ↦ F (values i)) =
-      F (ultralimitAlong U values) := by
-  apply ultralimitAlong_eq_of_tendsto
-  exact hF.continuousAt.tendsto.comp (tendsto_ultralimitAlong U values)
 
 /-- An eventual real upper bound passes to an arbitrary-index ultralimit. -/
 theorem ultralimitAlong_coe_le_of_eventually_le {ι : Type κ}

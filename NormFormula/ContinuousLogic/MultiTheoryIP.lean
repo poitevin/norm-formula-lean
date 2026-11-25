@@ -109,33 +109,6 @@ theorem hasInfiniteIPWitness_congr {Symbol : Type w}
       rw [hvalue (rows i) parameter]
       exact hhigh i hi
 
-/-- An infinite IP witness for a mapped formula in an expansion is exactly an
-IP witness for the original formula in the corresponding reduct. -/
-theorem hasInfiniteIPWitness_map_reduct_iff
-    {Symbol : Type w} {Target : Type z}
-    (f : Symbol → Target) (M : MultiStructure.{u, v, z} Target)
-    (φ : MultiFormula Symbol 1 1) (low high : ℝ) :
-    HasInfiniteIPWitness M (φ.map f) low high ↔
-      HasInfiniteIPWitness (M.reduct f) φ low high := by
-  constructor
-  · rintro ⟨rows, hrows⟩
-    refine ⟨rows, ?_⟩
-    intro E F hdisjoint
-    obtain ⟨parameter, hlow, hhigh⟩ := hrows E F hdisjoint
-    refine ⟨parameter, ?_, ?_⟩
-    · intro i hi
-      simpa only [binaryValue_map_reduct] using hlow i hi
-    · intro i hi
-      simpa only [binaryValue_map_reduct] using hhigh i hi
-  · rintro ⟨rows, hrows⟩
-    refine ⟨rows, ?_⟩
-    intro E F hdisjoint
-    obtain ⟨parameter, hlow, hhigh⟩ := hrows E F hdisjoint
-    refine ⟨parameter, ?_, ?_⟩
-    · intro i hi
-      simpa only [binaryValue_map_reduct] using hlow i hi
-    · intro i hi
-      simpa only [binaryValue_map_reduct] using hhigh i hi
 
 /-- A formula-preserving embedding into a same-theory expansion sends every
 infinite reduct IP witness to an expansion IP witness with the same gap. -/

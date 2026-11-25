@@ -35,8 +35,6 @@ theorem upper (x : HilbertSpace) :
 
 abbrev Space := SeminormRenorm (additiveSeminorm ε hε) (lower ε hε)
 
-def hilbertEquiv : Space ε hε ≃L[ℝ] HilbertSpace :=
-  SeminormRenorm.continuousLinearEquiv _ _ (1+ε*Real.sqrt 2) (upper ε hε)
 instance : CompleteSpace (Space ε hε) :=
   SeminormRenorm.completeSpace _ _ (1+ε*Real.sqrt 2) (upper ε hε)
 instance : TopologicalSpace.SeparableSpace (Space ε hε) :=

@@ -1,6 +1,5 @@
 import NormFormula.Analytic.YPredicates
 import NormFormula.Combinatorics.QIPPattern
-import NormFormula.ModelTheory.HilbertLocalNIP
 import NormFormula.ModelTheory.LocalNIP
 
 /-!
@@ -33,20 +32,6 @@ theorem qSeminormTranslate_isBoundedLocalNIP :
 
 namespace Y
 
-/-- Translation followed by the named Hilbert norm predicate on `Y`. -/
-noncomputable def hilbertNormPredicateTranslate (x y : Y) : ℝ :=
-  hilbertNormPredicate (x + y)
-
-/-- The named Hilbert norm predicate has bounded local NIP on `Y`. -/
-theorem hilbertNormPredicateTranslate_isBoundedLocalNIP :
-    NormFormula.IsBoundedLocalNIP hilbertNormPredicateTranslate := by
-  have hpullback :=
-    (NormFormula.hilbertNormTranslate_isBoundedLocalNIP
-      (E := HilbertSpace)).comap
-        (fun x : Y ↦ x.toHilbert) (fun y : Y ↦ y.toHilbert)
-        hilbert_norm_le_norm hilbert_norm_le_norm
-  simpa [hilbertNormPredicateTranslate, hilbertNormPredicate,
-    NormFormula.hilbertNormTranslate] using hpullback
 
 /-- Translation followed by the named `q` predicate on the actual `Y` sort. -/
 noncomputable def qPredicateTranslate (x y : Y) : ℝ := qPredicate (x + y)
@@ -61,13 +46,6 @@ theorem qPredicateTranslate_isBoundedLocalNIP :
     hilbert_norm_le_norm hilbert_norm_le_norm
   simpa [qPredicateTranslate, qPredicate, qSeminormTranslate] using hpullback
 
-/-- Consequently, no fixed bounded positive-gap IP pattern for the named
-`q` predicate occurs in every finite dimension of `Y`. -/
-theorem qPredicateTranslate_not_patterns_in_every_dimension
-    (R_x R_y low high : ℝ) (hgap : low < high) :
-    ¬ NormFormula.HasIPPatternsInEveryDimension
-      qPredicateTranslate R_x R_y low high :=
-  qPredicateTranslate_isBoundedLocalNIP.not_hasIPPatternsInEveryDimension hgap
 
 end Y
 

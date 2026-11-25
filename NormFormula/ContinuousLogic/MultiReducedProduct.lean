@@ -57,13 +57,6 @@ end MultiStructure
 variable {Symbol : Type w} (M : MultiStructure.{u, v, w} Symbol)
   (bounds : M.Bounds)
 
-/-- Interpret one symbol coordinatewise and take its truth-value ultralimit
-before passing to the metric separation quotients. -/
-def multiReducedPredicateOnSequences (symbol : Symbol)
-    (x : ReducedSequence bounds.row)
-    (y : ReducedSequence bounds.parameter) : TruthValue :=
-  reducedPredicateOnSequences (M.singlePredicate symbol)
-    (bounds.singlePredicate symbol) x y
 
 /-- The predicate associated with one symbol on the quotient sorts. -/
 def multiReducedPredicate (symbol : Symbol) :
@@ -102,16 +95,6 @@ def MultiStructure.reducedProduct : MultiStructure.{u, v, w} Symbol where
   predicate := multiReducedPredicate M bounds
   predicate_uniformContinuous := multiReducedPredicate_uniformContinuous M bounds
 
-/-- The diagonal maps preserve every distinguished predicate. -/
-@[simp]
-theorem multiReducedProduct_predicate_const (symbol : Symbol)
-    (x : M.Row) (y : M.Parameter) :
-    (M.reducedProduct bounds).predicate symbol
-      (ReducedProduct.const bounds.row x)
-      (ReducedProduct.const bounds.parameter y) = M.predicate symbol x y := by
-  change ultralimit (fun _ : ℕ ↦ M.predicate symbol x y) =
-    M.predicate symbol x y
-  exact ultralimit_const (M.predicate symbol x y)
 
 end
 

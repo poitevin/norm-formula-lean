@@ -54,27 +54,6 @@ theorem IsFatShattered.reparam
     rw [hvalue]
     exact hlow row hrow
 
-/-- Subtracting a common additive offset from all values preserves a fat-
-shattering witness after translating its row thresholds. -/
-theorem IsFatShattered.of_add_const
-    {ρ Parameter : Type*} [Fintype ρ]
-    {value : ρ → Parameter → ℝ} {offset ε : ℝ}
-    (hfat : IsFatShattered
-      (fun row parameter ↦ value row parameter + offset) ε) :
-    IsFatShattered value ε := by
-  obtain ⟨threshold, hthreshold⟩ := hfat
-  refine ⟨fun row ↦ threshold row - offset, ?_⟩
-  intro S
-  obtain ⟨parameter, hhigh, hlow⟩ := hthreshold S
-  refine ⟨parameter, ?_, ?_⟩
-  · intro row hrow
-    have := hhigh row hrow
-    dsimp
-    linarith
-  · intro row hrow
-    have := hlow row hrow
-    dsimp
-    linarith
 
 /-- Strict approximation within the fat-shattering margin preserves the
 subset encoded by every witness as an ordinary threshold trace. -/
@@ -122,20 +101,6 @@ theorem two_pow_card_le_trace_cover_of_fat_witness
   have hcard := Finset.card_le_card huniv
   simpa [Fintype.card_finset] using hcard
 
-/-- A finite trace cover approximating a fat-shattering family must contain
-all subsets of the row type, and hence has cardinality at least `2^|ρ|`. -/
-theorem two_pow_card_le_trace_cover_of_fat_shattered
-    {ρ β γ : Type*} [Fintype ρ]
-    {value : ρ → β → ℝ} {approxValue : ρ → γ → ℝ}
-    {approx : β → γ} {ε : ℝ} {traces : Finset (Finset ρ)}
-    (hfat : IsFatShattered value ε)
-    (herror : ∀ r b, |value r b - approxValue r (approx b)| < ε)
-    (hcover : ∀ threshold b,
-      thresholdTrace approxValue threshold (approx b) ∈ traces) :
-    2 ^ Fintype.card ρ ≤ traces.card := by
-  obtain ⟨threshold, hthreshold⟩ := hfat
-  exact two_pow_card_le_trace_cover_of_fat_witness
-    hthreshold herror (hcover threshold)
 
 /-- For fixed natural constants `C` and `d`, `C(n+1)^d` is eventually
 strictly smaller than `2^n`. -/

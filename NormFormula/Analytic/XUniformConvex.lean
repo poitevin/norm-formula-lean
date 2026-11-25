@@ -43,10 +43,6 @@ theorem blockSeminormValues_mem (z : XHilbertSpace) :
 def blockSeminormValues (z : XHilbertSpace) : ScalarL2 :=
   ⟨fun n ↦ blockSeminorm n (z n), blockSeminormValues_mem z⟩
 
-@[simp]
-theorem blockSeminormValues_apply (z : XHilbertSpace) (n : ℕ) :
-    blockSeminormValues z n = blockSeminorm n (z n) :=
-  rfl
 
 /-- The unbundled value of the paper's sum seminorm `M_oplus`. -/
 def sumSeminormValue (z : XHilbertSpace) : ℝ :=
@@ -80,7 +76,7 @@ theorem sumSeminormValue_smul (r : ℝ) (x : XHilbertSpace) :
     sumSeminormValue (r • x) = ‖r‖ * sumSeminormValue x := by
   have hvec : blockSeminormValues (r • x) = ‖r‖ • blockSeminormValues x := by
     ext n
-    simp [map_smul_eq_mul]
+    simp [blockSeminormValues, map_smul_eq_mul]
   rw [sumSeminormValue, hvec, norm_smul, sumSeminormValue]
   simp
 
@@ -102,11 +98,6 @@ theorem sumSeminorm_sq (z : XHilbertSpace) :
     (lp.norm_rpow_eq_tsum
       (by norm_num : 0 < (2 : ENNReal).toReal) (blockSeminormValues z))
 
-/-- The bundled seminorm agrees with the square-root formula in the paper. -/
-theorem sumSeminorm_eq_sqrt_tsum (z : XHilbertSpace) :
-    sumSeminorm z = Real.sqrt (∑' n, blockSeminorm n (z n) ^ 2) := by
-  rw [← sumSeminorm_sq]
-  exact (Real.sqrt_sq (apply_nonneg sumSeminorm z)).symm
 
 /-- The global bound `M_oplus(z)^2 ≤ 2 * ‖z‖₂^2`. -/
 theorem sumSeminorm_sq_le_two_mul_norm_sq (z : XHilbertSpace) :

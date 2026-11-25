@@ -134,12 +134,6 @@ def standardValue {n : ℕ} {context : BallContext n} {r : ℚ≥0}
     (assignment : Assignment (standardRationalBallSystem (E := E)) context) : E :=
   (term.realize (standardRationalBallSystem (E := E)) assignment).1
 
-@[simp]
-theorem standardValue_variable {n : ℕ} {context : BallContext n}
-    (i : Fin n)
-    (assignment : Assignment (standardRationalBallSystem (E := E)) context) :
-    (BallTerm.variable i).standardValue assignment = (assignment i).1 :=
-  rfl
 
 @[simp]
 theorem standardValue_inclusion {n : ℕ} {context : BallContext n}

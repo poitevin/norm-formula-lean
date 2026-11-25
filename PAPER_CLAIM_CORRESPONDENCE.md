@@ -23,7 +23,7 @@ also audits axioms and transitive proof dependencies.
 | Main geometric conclusions for `X,Y` | `PaperClaims.positive_geometric_conclusions`; `PaperClaims.main_theorem` | Exact: separability, midpoint constant `1/12`, uniform convexity, and Hilbert comparison constants `1,√3`. |
 | Corollary 5.2: distinguished-space instability and NIP, complete-theory IP, IP in every free ultrapower, and geometry | `PaperClaims.xy_positive_unstable_ballNIP_and_fullBanachBallTheoryIP`; `PaperClaims.xy_positive_with_every_ultrapower`; `PaperClaims.positive_geometric_conclusions` | Exact for `XYPositiveSpace`; the arbitrary-ultrafilter witness retains the `√2` bounds and `√3,√6` thresholds. |
 | Theorem 6.1: separable elementary extension `X ≺ W` with IP and the stated geometry | `PaperClaims.exists_separable_hilbertian_ip_model` | Exact. The source is `XPositiveSpace`; the same `W` has all conclusions. The public raw witness is in the `2`-ball, with thresholds `√3,√6`; the typed formula has radii `2,2` and thresholds `√3/8,√6/8`. |
-| Theorem 1.1, as one conjunction | `PaperClaims.main_theorem` in `PositivePaperClaims.lean` | Exact for the positive-index presentation. The former zero-index statement is retained as `main_theorem_zeroBased`. |
+| Theorem 1.1, as one conjunction | `PaperClaims.main_theorem` in `PositivePaperClaims.lean` | Exact for the positive-index presentation. |
 | Table 1 and the abstract: separability, midpoint estimate, and `√3` distortion to `ℓ₂` for all five spaces | `PaperClaims.l2_table_geometry`; `X.positive_sqrtThree_isomorphic_l2`; `HalfGraph.y_sqrtThree_isomorphic_l2`; `XY.xy_positive_sqrtThree_isomorphic_l2`; `SeparableHilbertianNormAddIPModel.sqrtThree_isomorphic_l2` | The distortion conclusions bound the product of the operator norms of an equivalence to `HalfGraph.RealL2` and its inverse. The result for `W` applies to the same model package as the elementary extension. The other midpoint and separability conclusions appear in the main and direct-sum endpoints above. |
 
 Names in tables are relative to `NormFormula`; `MultiFormula` and the
@@ -73,7 +73,7 @@ For general `ℓ₂`-sum stability, compactness of each finite-dimensional coord
 ball supplies a coordinatewise convergent subsequence. A further subsequence
 makes the norm defect converge. The general asymptotic Pythagoras theorem then
 computes both iterated limits. This discharges the compactness needed for the
-printed proof directly; the older weak-compactness interface remains available.
+printed proof directly.
 
 ## Section 4.2 elementary proof
 
@@ -92,9 +92,9 @@ set has at most `2n(m+1)^2` members, giving at most
 both the copy and the numerical index. The existential multiplicative constant
 need not equal a particular numerical choice in the article.
 
-The old degree-`2k` hyperplane estimates remain supplementary. The proof audit
-rejects their use and the former strict truncation argument in the elementary
-count, fat-shattering, and both renorming results. It checks that the
+The proof audit rejects reliance on the earlier degree-`2k` hyperplane bound
+and strict truncation argument in the elementary count, fat-shattering, and both
+renorming results. It checks that the
 sparse-trace theorem uses the finite maximum, earlier-zero test, protected
 initial segment, and elementary count over the real cut partition.
 
@@ -150,8 +150,7 @@ ordered-pair seminorm `q` on natural-number coordinates.
 `XSpace` includes the empty block at zero. `xSpaceEquivPositive` moves each
 empty-subset coordinate to the next block and fixes the other coordinates;
 the block seminorms ignore those empty-subset coordinates. Public main and
-positive direct-sum statements use the paper's presentation. The old internal
-endpoints remain available under their existing names.
+positive direct-sum statements use the paper's presentation.
 
 `Y` uses zero-based coordinates, identified with the paper's indices by
 `j ↦ j+1`. The direct membership space uses two copies of `ℓ₂`, with the second
@@ -166,8 +165,7 @@ The condition `U ≤ atTop` expresses nonprincipality on `ℕ`.
 The `W` construction retains the diagonal copy of `X`, applies the proved
 countable-language Tarski–Vaught construction, and reconstructs the complete
 Banach carrier. The elementary embedding, norm IP witness, and geometry all
-refer to that same carrier. The older radius-`4` lemmas remain compatibility
-results; the public theorem uses the sharp radius-`2` landing result.
+refer to that same carrier. The public theorem uses the radius-`2` landing result.
 
 ## Validation and scope
 
@@ -187,7 +185,4 @@ unfinished proof declarations or custom axioms.
 
 The scope treats the discussion of superreflexivity, superstability,
 nondistortion, and stability of entire Hilbert theories as cited background.
-The former `ModelTheory.XHilbertianIPModel` presentation remains a labelled
-legacy interface, not evidence for the public claims. Different standard
-background proofs, such as the direct Hilbert sign-sum argument excluding
-`c₀`, remain permissible implementation choices and require no article edits.
+The exclusion of an isomorphic copy of `c₀` uses a direct Hilbert sign-sum argument.

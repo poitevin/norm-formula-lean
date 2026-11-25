@@ -1,38 +1,11 @@
 import NormFormula.Analytic.Separability
 import NormFormula.Examples.YInstability
-import NormFormula.ModelTheory.YTheoryNIP
 
-/-!
-# The theorem about `Y`
-
-This module assembles the previously verified components: the norm formula is
-unstable on the distinguished space and NIP in its complete theory, while
-`Y` is separable, uniformly convex with the stated midpoint estimate, and
-`√3`-isomorphic to its Hilbert model.
--/
+/-! Separability and quantitative norm geometry of `Y`. -/
 
 namespace NormFormula.HalfGraph.Y
 
 noncomputable section
-
-universe w z
-
-namespace CompleteTheoryPresentation
-
-variable {S : NormFormula.ContinuousNIPSemantics Y Y}
-
-/-- The logical conclusions of the paper's theorem about `Y`. -/
-theorem normFormula_unstableInY_and_isNIPInCompleteTheory
-    (P : CompleteTheoryPresentation S) :
-    (¬ NormFormula.IsStableOnBounded (S.reductValue P.normFormula)) ∧
-      S.IsNIPInReduct P.normFormula := by
-  constructor
-  · intro hstable
-    exact normPredicateTranslate_not_isStableOnBounded
-      (hstable.congr P.normFormula_value)
-  · exact P.normFormula_isNIPInCompleteTheory
-
-end CompleteTheoryPresentation
 
 /-- The unconditional separability and quantitative geometric conclusions
 for the concrete space `Y`. -/

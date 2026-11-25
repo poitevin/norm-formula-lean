@@ -1037,80 +1037,6 @@ theorem dist_inclusion_smul_eq_zero_of_sameCompleteTheory
   exact (div_eq_zero_iff.mp hcoe).resolve_right
     (ne_of_gt (M.sortBound_pos (q.nnabs * s)))
 
-/-! ## First transferred algebraic identity -/
-
-/-- Failure of involutive negation in one radius sort. -/
-def negNegFormula (r : ℚ≥0) :
-    BallFormula PredicateSymbol predicateRadius
-      (![r] : BallContext 1) :=
-  .distance (.neg (.neg (.variable 0))) (.variable 0)
-
-/-- Universal involutive-negation sentence at radius `r`. -/
-def negNegSentence (r : ℚ≥0) :
-    BallSentence PredicateSymbol predicateRadius :=
-  .iSup r (negNegFormula r)
-
-/-- Double negation has zero discrepancy in the distinguished X expansion. -/
-theorem negNegFormula_realize (r : ℚ≥0)
-    (assignment : BallTerm.Assignment
-      expansionStructure.toRationalBallSystem
-      (![r] : BallContext 1)) :
-    (negNegFormula r).realize expansionStructure assignment =
-      zeroTruthValue := by
-  apply Subtype.ext
-  change dist (-(-((assignment 0).1))) (assignment 0).1 /
-      rationalBallMetricBound r = 0
-  simp
-
-/-- Involutive negation is a zero-valued sentence of the distinguished X
-complete theory. -/
-@[simp] theorem negNegSentence_value (r : ℚ≥0) :
-    (negNegSentence r).value expansionStructure = zeroTruthValue := by
-  change (⨆ x : expansionStructure.Ball r,
-      (negNegFormula r).realize expansionStructure
-        (Fin.cons x (fun i : Fin 0 ↦ nomatch i))) = zeroTruthValue
-  apply le_antisymm
-  · exact iSup_le fun x ↦
-      (negNegFormula_realize r
-        (Fin.cons x (fun i : Fin 0 ↦ nomatch i))).le
-  · exact ((⨆ x : expansionStructure.Ball r,
-      (negNegFormula r).realize expansionStructure
-        (Fin.cons x (fun i : Fin 0 ↦ nomatch i))) : TruthValue).2.1
-
-/-- Every model of the complete typed X theory has involutive negation up to
-zero pseudodistance. -/
-theorem dist_neg_neg_eq_zero_of_sameCompleteTheory
-    (M : BallStructure.{u} PredicateSymbol predicateRadius)
-    (hTheory : BallSameCompleteTheory expansionStructure M)
-    (r : ℚ≥0) (x : M.Ball r) :
-    dist (M.neg r (M.neg r x)) x = 0 := by
-  have hsentence : (negNegSentence r).value M = zeroTruthValue := by
-    calc
-      (negNegSentence r).value M =
-          (negNegSentence r).value expansionStructure :=
-        (hTheory (negNegSentence r)).symm
-      _ = zeroTruthValue := negNegSentence_value r
-  have hle := realize_le_unarySentence M r (negNegFormula r) x
-  change (negNegFormula r).realize M _ ≤
-    (negNegSentence r).value M at hle
-  rw [hsentence] at hle
-  have hzero : (negNegFormula r).realize M
-      (Fin.cons x (fun i : Fin 0 ↦ nomatch i)) = zeroTruthValue :=
-    le_antisymm hle
-      ((negNegFormula r).realize M
-        (Fin.cons x (fun i : Fin 0 ↦ nomatch i))).2.1
-  have hcoe := congrArg (fun value : TruthValue ↦ (value : ℝ)) hzero
-  change dist (M.neg r (M.neg r x)) x / M.sortBound r = 0 at hcoe
-  exact (div_eq_zero_iff.mp hcoe).resolve_right
-    (ne_of_gt (M.sortBound_pos r))
-
-/-- Failure of the right zero law, compared in the radius `r+r` sort. -/
-def addZeroFormula (r : ℚ≥0) :
-    BallFormula PredicateSymbol predicateRadius
-      (![r] : BallContext 1) :=
-  .distance
-    (.add (.variable 0) (.zero r))
-    (.inclusion (le_add_of_nonneg_right (zero_le r)) (.variable 0))
 
 /-- Failure of the left zero law, compared in the radius `r+r` sort. -/
 def zeroAddFormula (r : ℚ≥0) :
@@ -1120,24 +1046,11 @@ def zeroAddFormula (r : ℚ≥0) :
     (.add (.zero r) (.variable 0))
     (.inclusion (le_add_of_nonneg_left (zero_le r)) (.variable 0))
 
-def addZeroSentence (r : ℚ≥0) :
-    BallSentence PredicateSymbol predicateRadius :=
-  .iSup r (addZeroFormula r)
 
 def zeroAddSentence (r : ℚ≥0) :
     BallSentence PredicateSymbol predicateRadius :=
   .iSup r (zeroAddFormula r)
 
-theorem addZeroFormula_realize (r : ℚ≥0)
-    (assignment : BallTerm.Assignment
-      expansionStructure.toRationalBallSystem
-      (![r] : BallContext 1)) :
-    (addZeroFormula r).realize expansionStructure assignment =
-      zeroTruthValue := by
-  apply Subtype.ext
-  change dist ((assignment 0).1 + 0) (assignment 0).1 /
-      rationalBallMetricBound (r + r) = 0
-  simp
 
 theorem zeroAddFormula_realize (r : ℚ≥0)
     (assignment : BallTerm.Assignment
@@ -1150,18 +1063,6 @@ theorem zeroAddFormula_realize (r : ℚ≥0)
       rationalBallMetricBound (r + r) = 0
   simp
 
-@[simp] theorem addZeroSentence_value (r : ℚ≥0) :
-    (addZeroSentence r).value expansionStructure = zeroTruthValue := by
-  change (⨆ x : expansionStructure.Ball r,
-      (addZeroFormula r).realize expansionStructure
-        (Fin.cons x (fun i : Fin 0 ↦ nomatch i))) = zeroTruthValue
-  apply le_antisymm
-  · exact iSup_le fun x ↦
-      (addZeroFormula_realize r
-        (Fin.cons x (fun i : Fin 0 ↦ nomatch i))).le
-  · exact ((⨆ x : expansionStructure.Ball r,
-      (addZeroFormula r).realize expansionStructure
-        (Fin.cons x (fun i : Fin 0 ↦ nomatch i))) : TruthValue).2.1
 
 @[simp] theorem zeroAddSentence_value (r : ℚ≥0) :
     (zeroAddSentence r).value expansionStructure = zeroTruthValue := by
@@ -1176,33 +1077,6 @@ theorem zeroAddFormula_realize (r : ℚ≥0)
       (zeroAddFormula r).realize expansionStructure
         (Fin.cons x (fun i : Fin 0 ↦ nomatch i))) : TruthValue).2.1
 
-theorem dist_add_zero_eq_zero_of_sameCompleteTheory
-    (M : BallStructure.{u} PredicateSymbol predicateRadius)
-    (hTheory : BallSameCompleteTheory expansionStructure M)
-    (r : ℚ≥0) (x : M.Ball r) :
-    dist (M.add r r (x, M.zero r))
-      (M.inclusion (le_add_of_nonneg_right (zero_le r)) x) = 0 := by
-  have hsentence : (addZeroSentence r).value M = zeroTruthValue := by
-    calc
-      (addZeroSentence r).value M =
-          (addZeroSentence r).value expansionStructure :=
-        (hTheory (addZeroSentence r)).symm
-      _ = zeroTruthValue := addZeroSentence_value r
-  have hle := realize_le_unarySentence M r (addZeroFormula r) x
-  change (addZeroFormula r).realize M _ ≤
-    (addZeroSentence r).value M at hle
-  rw [hsentence] at hle
-  have hzero : (addZeroFormula r).realize M
-      (Fin.cons x (fun i : Fin 0 ↦ nomatch i)) = zeroTruthValue :=
-    le_antisymm hle
-      ((addZeroFormula r).realize M
-        (Fin.cons x (fun i : Fin 0 ↦ nomatch i))).2.1
-  have hcoe := congrArg (fun value : TruthValue ↦ (value : ℝ)) hzero
-  change dist (M.add r r (x, M.zero r))
-      (M.inclusion (le_add_of_nonneg_right (zero_le r)) x) /
-        M.sortBound (r + r) = 0 at hcoe
-  exact (div_eq_zero_iff.mp hcoe).resolve_right
-    (ne_of_gt (M.sortBound_pos (r + r)))
 
 theorem dist_zero_add_eq_zero_of_sameCompleteTheory
     (M : BallStructure.{u} PredicateSymbol predicateRadius)
@@ -1232,13 +1106,6 @@ theorem dist_zero_add_eq_zero_of_sameCompleteTheory
   exact (div_eq_zero_iff.mp hcoe).resolve_right
     (ne_of_gt (M.sortBound_pos (r + r)))
 
-/-- Failure of right additive cancellation in the radius `r+r` sort. -/
-def addNegFormula (r : ℚ≥0) :
-    BallFormula PredicateSymbol predicateRadius
-      (![r] : BallContext 1) :=
-  .distance
-    (.add (.variable 0) (.neg (.variable 0)))
-    (.zero (r + r))
 
 /-- Failure of left additive cancellation in the radius `r+r` sort. -/
 def negAddFormula (r : ℚ≥0) :
@@ -1248,24 +1115,11 @@ def negAddFormula (r : ℚ≥0) :
     (.add (.neg (.variable 0)) (.variable 0))
     (.zero (r + r))
 
-def addNegSentence (r : ℚ≥0) :
-    BallSentence PredicateSymbol predicateRadius :=
-  .iSup r (addNegFormula r)
 
 def negAddSentence (r : ℚ≥0) :
     BallSentence PredicateSymbol predicateRadius :=
   .iSup r (negAddFormula r)
 
-theorem addNegFormula_realize (r : ℚ≥0)
-    (assignment : BallTerm.Assignment
-      expansionStructure.toRationalBallSystem
-      (![r] : BallContext 1)) :
-    (addNegFormula r).realize expansionStructure assignment =
-      zeroTruthValue := by
-  apply Subtype.ext
-  change dist ((assignment 0).1 + -((assignment 0).1)) 0 /
-      rationalBallMetricBound (r + r) = 0
-  simp
 
 theorem negAddFormula_realize (r : ℚ≥0)
     (assignment : BallTerm.Assignment
@@ -1278,18 +1132,6 @@ theorem negAddFormula_realize (r : ℚ≥0)
       rationalBallMetricBound (r + r) = 0
   simp
 
-@[simp] theorem addNegSentence_value (r : ℚ≥0) :
-    (addNegSentence r).value expansionStructure = zeroTruthValue := by
-  change (⨆ x : expansionStructure.Ball r,
-      (addNegFormula r).realize expansionStructure
-        (Fin.cons x (fun i : Fin 0 ↦ nomatch i))) = zeroTruthValue
-  apply le_antisymm
-  · exact iSup_le fun x ↦
-      (addNegFormula_realize r
-        (Fin.cons x (fun i : Fin 0 ↦ nomatch i))).le
-  · exact ((⨆ x : expansionStructure.Ball r,
-      (addNegFormula r).realize expansionStructure
-        (Fin.cons x (fun i : Fin 0 ↦ nomatch i))) : TruthValue).2.1
 
 @[simp] theorem negAddSentence_value (r : ℚ≥0) :
     (negAddSentence r).value expansionStructure = zeroTruthValue := by
@@ -1304,31 +1146,6 @@ theorem negAddFormula_realize (r : ℚ≥0)
       (negAddFormula r).realize expansionStructure
         (Fin.cons x (fun i : Fin 0 ↦ nomatch i))) : TruthValue).2.1
 
-theorem dist_add_neg_eq_zero_of_sameCompleteTheory
-    (M : BallStructure.{u} PredicateSymbol predicateRadius)
-    (hTheory : BallSameCompleteTheory expansionStructure M)
-    (r : ℚ≥0) (x : M.Ball r) :
-    dist (M.add r r (x, M.neg r x)) (M.zero (r + r)) = 0 := by
-  have hsentence : (addNegSentence r).value M = zeroTruthValue := by
-    calc
-      (addNegSentence r).value M =
-          (addNegSentence r).value expansionStructure :=
-        (hTheory (addNegSentence r)).symm
-      _ = zeroTruthValue := addNegSentence_value r
-  have hle := realize_le_unarySentence M r (addNegFormula r) x
-  change (addNegFormula r).realize M _ ≤
-    (addNegSentence r).value M at hle
-  rw [hsentence] at hle
-  have hzero : (addNegFormula r).realize M
-      (Fin.cons x (fun i : Fin 0 ↦ nomatch i)) = zeroTruthValue :=
-    le_antisymm hle
-      ((addNegFormula r).realize M
-        (Fin.cons x (fun i : Fin 0 ↦ nomatch i))).2.1
-  have hcoe := congrArg (fun value : TruthValue ↦ (value : ℝ)) hzero
-  change dist (M.add r r (x, M.neg r x)) (M.zero (r + r)) /
-      M.sortBound (r + r) = 0 at hcoe
-  exact (div_eq_zero_iff.mp hcoe).resolve_right
-    (ne_of_gt (M.sortBound_pos (r + r)))
 
 theorem dist_neg_add_eq_zero_of_sameCompleteTheory
     (M : BallStructure.{u} PredicateSymbol predicateRadius)

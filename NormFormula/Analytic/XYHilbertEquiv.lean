@@ -74,13 +74,6 @@ def linearEquivHilbertSum : XYSpace ≃ₗ[ℝ] XYHilbertSpace where
     · exact X.linearEquivHilbertSum.map_smul c z.fst
     · exact HalfGraph.Y.linearEquivHilbert.map_smul c z.snd
 
-@[simp]
-theorem linearEquivHilbertSum_apply (z : XYSpace) :
-    linearEquivHilbertSum z = toHilbert z := rfl
-
-@[simp]
-theorem linearEquivHilbertSum_symm_apply (z : XYHilbertSpace) :
-    linearEquivHilbertSum.symm z = ofHilbert z := rfl
 
 /-- The forward coordinatewise map does not increase the norm. -/
 theorem norm_toHilbert_le (z : XYSpace) :

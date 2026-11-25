@@ -109,9 +109,6 @@ theorem augmentedNorm_eq_zero (M : Seminorm ℝ E) (x : E) :
 noncomputable def augmentedSeminorm (M : Seminorm ℝ E) : Seminorm ℝ E :=
   Seminorm.of (augmentedNorm M) (augmentedNorm_add_le M) (augmentedNorm_smul M)
 
-@[simp]
-theorem augmentedSeminorm_apply (M : Seminorm ℝ E) (x : E) :
-    augmentedSeminorm M x = augmentedNorm M x := rfl
 
 /-- Squared upper comparison used in the paper. -/
 theorem augmentedNorm_sq_le_three_mul

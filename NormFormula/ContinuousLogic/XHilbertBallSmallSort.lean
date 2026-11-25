@@ -1,5 +1,6 @@
 import Mathlib.Topology.MetricSpace.Antilipschitz
 import NormFormula.ContinuousLogic.XHilbertBallNormAddIP
+import NormFormula.Analytic.MidpointUniformConvex
 
 /-!
 # Recovering the small ball sorts in an abstract X-theory model
@@ -36,12 +37,6 @@ def unitBallExcessTruth (target : ℚ≥0) (values : Fin 1 → TruthValue) :
       div_nonneg (by norm_num) (rationalBallMetricBound_pos target).le
     exact (sub_le_self (values 0 : ℝ) hnonneg).trans (values 0).2.2
 
-@[simp]
-theorem unitBallExcessTruth_coe (target : ℚ≥0)
-    (values : Fin 1 → TruthValue) :
-    (unitBallExcessTruth target values : ℝ) =
-      max 0 ((values 0 : ℝ) - 1 / rationalBallMetricBound target) :=
-  rfl
 
 /-- The normalized unit-ball excess as a unary continuous connective. -/
 def unitBallExcessConnective (target : ℚ≥0) : Connective 1 where

@@ -3,6 +3,8 @@
 Lean 4 formalization of Pedro Poitevin's paper. This version corresponds to
 the revision published on arXiv on 16 November 2026. [arXiv:2611.15930v2](https://arxiv.org/abs/2611.15930v2)
 
+The default import, `NormFormula`, exposes the declarations used to verify the manuscript. The original release remains available at the `arxiv-v2` tag.
+
 ## What Lean checks
 
 | Result in the paper | Lean declaration |

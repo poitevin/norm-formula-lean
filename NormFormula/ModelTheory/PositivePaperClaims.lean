@@ -1,4 +1,5 @@
 import NormFormula.ModelTheory.PaperClaims
+import NormFormula.Analytic.MidpointUniformConvex
 
 /-! # Public conclusions for the paper's positive-index presentation -/
 

@@ -31,15 +31,6 @@ theorem exists_equiv_l2_of_hilbert_equiv_le
     simpa only [LinearIsometryEquiv.norm_map] using
       e.symm.toContinuousLinearMap.le_opNorm (f.symm z)
 
-/-- A Hilbert equivalence and a countable independent family identify a
-separable Hilbertian space with the standard real sequence space. -/
-theorem exists_equiv_l2_of_hilbert_equiv
-    {E H : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
-    [NormedAddCommGroup H] [InnerProductSpace ℝ H] [CompleteSpace H] [SeparableSpace H]
-    (e : E ≃L[ℝ] H) (v : ℕ → E) (hv : LinearIndependent ℝ v) :
-    Nonempty (E ≃L[ℝ] HalfGraph.RealL2) := by
-  obtain ⟨J, _, _⟩ := exists_equiv_l2_of_hilbert_equiv_le e v hv
-  exact ⟨J⟩
 
 /-- The distortion condition in the introduction of arXiv:2611.15930v2. -/
 def IsSqrtThreeIsomorphicToL2 (E : Type*) [NormedAddCommGroup E] [NormedSpace ℝ E] : Prop :=

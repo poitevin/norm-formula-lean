@@ -5,7 +5,6 @@ import NormFormula.ContinuousLogic.FullBanachBallTheoryIP
 import NormFormula.ContinuousLogic.YFullBanachBallTheoryNIP
 import NormFormula.ContinuousLogic.NormAddFixedBalls
 import NormFormula.ContinuousLogic.XTheoryIP
-import NormFormula.ContinuousLogic.YFinitePatternNIP
 import NormFormula.ModelTheory.YTheorem
 import NormFormula.ModelTheory.XYTheorem
 
@@ -30,13 +29,6 @@ noncomputable section
 
 open NormFormula.ContinuousLogic
 
-/-- Earlier normalized-language version of the conclusion about `X`:
-stability is for the concrete norm formula on `X`, and theory IP is in the
-minimal normalized bounded norm-addition language. -/
-theorem x_stable_and_normalizedNormTheoryIP :
-    NormFormula.IsStableOnBounded NormFormula.X.normTranslate ∧
-      NormFormulaHasIPInCompleteTheory NormFormula.X.XSpace :=
-  NormFormula.X.normFormula_stableInX_and_hasSemanticTheoryIP
 
 /-- Full-language conclusion for the formal `XSpace`: the
 concrete norm formula is stable on `X`, but its radius-`2` instance has IP in
@@ -51,17 +43,6 @@ theorem x_stable_and_fullBanachBallTheoryIP :
   ⟨NormFormula.X.normFormula_stableInX_and_hasSemanticTheoryIP.1,
     NormFormula.X.predicateFreeNormAddFormula_hasIPInCompleteTheory⟩
 
-/-- Assumption-free complete-theory NIP for `Y` on every positive ball,
-together with instability of the concrete norm formula. -/
-theorem y_unstable_and_ballTheoryNIP :
-    (¬ NormFormula.IsStableOnBounded
-      NormFormula.HalfGraph.Y.normPredicateTranslate) ∧
-      ∀ (R : ℝ) (hR : 0 < R),
-        MultiFormula.IsNIPInCompleteTheory
-          (NormFormula.HalfGraph.Y.ContinuousLanguage.reductStructure R hR)
-          NormFormula.HalfGraph.Y.ContinuousLanguage.normFormula := by
-  exact ⟨NormFormula.HalfGraph.Y.normPredicateTranslate_not_isStableOnBounded,
-    NormFormula.HalfGraph.Y.ContinuousLanguage.normFormula_isNIPInCompleteTheory⟩
 
 /-- Exact full-language counterpart of the paper's theorem about `Y`: the
 concrete norm formula is unstable, while every independently bounded typed
@@ -79,14 +60,6 @@ theorem y_unstable_and_fullBanachBallTheoryNIP :
   ⟨NormFormula.HalfGraph.Y.normPredicateTranslate_not_isStableOnBounded,
     NormFormula.HalfGraph.Y.predicateFreeNormAddFormula_isNIPInCompleteTheory_mixed⟩
 
-/-- Earlier normalized-language version of the direct-sum corollary: instability
-and NIP hold on every distinguished positive ball, while theory IP is in the
-minimal normalized bounded norm-addition language. -/
-theorem xy_unstable_ballNIP_and_normalizedNormTheoryIP :
-    (¬ NormFormula.IsStableOnBounded NormFormula.XY.normTranslate) ∧
-      NormFormulaIsNIPOnPositiveBalls NormFormula.XY.XYSpace ∧
-      NormFormulaHasIPInCompleteTheory NormFormula.XY.XYSpace :=
-  NormFormula.XY.normFormula_unstable_locallyNIP_and_theoryIP
 
 /-- Full-language conclusion for the formal direct sum: the norm formula is
 unstable and NIP on every distinguished positive ball, while its radius-`2`
@@ -230,19 +203,6 @@ theorem exists_separable_hilbertian_ip_model :
     SeparableHilbertianIPModelConclusion NormFormula.X.XPositiveSpace :=
   exists_separable_hilbertian_ip_model_of_equiv NormFormula.X.xSpaceEquivPositive.symm
 
-/-- Public assembly of the formalized conclusions: the full-language model-theoretic
-conclusions for `X` and `Y`, the concrete geometry (with the direct-sum
-strengthening), and the constructed separable elementary extension `W`.
-The same `XSpace` is used in all conjuncts involving `X`. -/
-theorem main_theorem_zeroBased :
-    XFullLanguageConclusion ∧
-      YFullLanguageConclusion ∧
-      ConcreteGeometricConclusions ∧
-      SeparableHilbertianIPModelConclusion NormFormula.X.XSpace :=
-  ⟨x_stable_and_fullBanachBallTheoryIP,
-    y_unstable_and_fullBanachBallTheoryNIP,
-    concrete_geometric_conclusions,
-    exists_separable_hilbertian_ip_model_of_equiv (LinearIsometryEquiv.refl ℝ _)⟩
 
 end
 

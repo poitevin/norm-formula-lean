@@ -25,16 +25,6 @@ namespace CompleteTheoryIPPresentation
 
 variable {S : NormFormula.CompleteTheoryIPSemantics XSpace XSpace}
 
-/-- The formal version of the paper's theorem about `X`: the interpretation
-of the norm formula is stable on the distinguished space, while the formula
-token has IP in the complete theory. -/
-theorem normFormula_stableInX_and_isIPInCompleteTheory
-    (P : CompleteTheoryIPPresentation S) :
-    NormFormula.IsStableOnBounded (S.formulaValue P.normFormula) ∧
-      S.IsIPInTheory P.normFormula := by
-  constructor
-  · exact normTranslate_isStableOnBounded.congr P.normFormula_value.symm
-  · exact P.normFormula_isIPInCompleteTheory
 
 end CompleteTheoryIPPresentation
 

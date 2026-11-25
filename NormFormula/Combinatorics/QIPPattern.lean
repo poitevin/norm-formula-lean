@@ -29,17 +29,5 @@ theorem exists_qTranslation_IPPattern_bound
   dsimp [ε]
   linarith
 
-/-- Equivalently, bounded fixed-gap IP patterns for `q` cannot occur in
-every finite dimension. -/
-theorem not_qTranslation_IPPatterns_all_dimensions
-    (R_x R_y low high : ℝ) (hgap : low < high) :
-    ¬ ∀ n : ℕ, ∃ rows : Fin n → HilbertSpace,
-      (∀ r, ‖rows r‖ ≤ R_x) ∧
-      NormFormula.IsIPPattern (qTranslationValue rows R_y) low high := by
-  obtain ⟨N, hN⟩ :=
-    exists_qTranslation_IPPattern_bound R_x R_y low high hgap
-  intro hall
-  obtain ⟨rows, hrows, hip⟩ := hall N
-  exact (Nat.lt_irrefl N) (hN N rows hrows hip)
 
 end NormFormula.HalfGraph

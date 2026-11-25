@@ -128,18 +128,6 @@ theorem ballReducedProduct_predicate_mk (symbol : Symbol)
       ultralimit (fun n ↦ M.predicate symbol (x n)) :=
   completedBallReducedPredicate_mk M symbol x
 
-/-- The diagonal embedding preserves every named predicate exactly. -/
-@[simp]
-theorem ballReducedProduct_predicate_const (symbol : Symbol)
-    (x : M.Ball (symbolRadius symbol)) :
-    M.reducedProduct.predicate symbol
-        (M.toRationalBallSystem.reducedConst (symbolRadius symbol) x) =
-      M.predicate symbol x := by
-  rw [show M.toRationalBallSystem.reducedConst (symbolRadius symbol) x =
-      ReducedProduct.completedMk
-        (M.toRationalBallSystem.reducedBound (symbolRadius symbol)) (fun _ ↦ x) by rfl,
-    ballReducedProduct_predicate_mk]
-  exact ultralimit_const (M.predicate symbol x)
 
 /-- Normalized distance on completed reduced representatives is the
 ultralimit of the original normalized coordinate distances. -/
@@ -163,19 +151,6 @@ theorem ballReducedProduct_distance_mk (r : ℚ≥0)
   rw [div_one, Completion.dist_eq, ReducedProduct.dist_mk]
   rfl
 
-/-- The diagonal embedding also preserves normalized distance atoms. -/
-@[simp]
-theorem ballReducedProduct_distance_const (r : ℚ≥0) (x y : M.Ball r) :
-    normalizedBallDistanceTruth M.reducedProduct.toRationalBallSystem r
-        (M.toRationalBallSystem.reducedConst r x)
-        (M.toRationalBallSystem.reducedConst r y) =
-      normalizedBallDistanceTruth M.toRationalBallSystem r x y := by
-  rw [show M.toRationalBallSystem.reducedConst r x =
-      ReducedProduct.completedMk (M.toRationalBallSystem.reducedBound r) (fun _ ↦ x) by rfl,
-    show M.toRationalBallSystem.reducedConst r y =
-      ReducedProduct.completedMk (M.toRationalBallSystem.reducedBound r) (fun _ ↦ y) by rfl,
-    ballReducedProduct_distance_mk]
-  exact ultralimit_const _
 
 end
 

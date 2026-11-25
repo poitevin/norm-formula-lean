@@ -31,14 +31,6 @@ namespace BallWitnessIndexing
 variable {Symbol : Type w} {symbolRadius : Symbol → ℚ≥0}
   {M : BallStructure.{u, w} Symbol symbolRadius}
 
-/-- Bundle a countable dependent family of ambient maps as one indexing. -/
-def ofMaps (Index : ℚ≥0 → Type (max u w))
-    [∀ radius, Countable (Index radius)]
-    (indexMap : ∀ radius, Index radius → M.Ball radius) :
-    BallWitnessIndexing M where
-  Index := Index
-  indexCountable := fun radius ↦ inferInstanceAs (Countable (Index radius))
-  indexMap := indexMap
 
 /-- Requests over the current stage whose witness belongs to one specified
 radius sort. -/
@@ -93,31 +85,6 @@ def operated [Encodable Symbol] (current : BallWitnessIndexing M)
     current.next.Index request.outputRadius :=
   Sum.inr (Sum.inr ⟨request, rfl⟩)
 
-@[simp]
-theorem next_indexMap_old [Encodable Symbol]
-    (current : BallWitnessIndexing M) (radius : ℚ≥0)
-    (index : current.Index radius) :
-    current.next.indexMap radius (current.old radius index) =
-      current.indexMap radius index :=
-  rfl
-
-@[simp]
-theorem next_indexMap_requested [Encodable Symbol]
-    (current : BallWitnessIndexing M)
-    (request : BallWitnessRequest Symbol symbolRadius current.Index) :
-    current.next.indexMap request.quantifiedRadius
-        (current.requested request) =
-      request.witness M current.indexMap :=
-  rfl
-
-@[simp]
-theorem next_indexMap_operated [Encodable Symbol]
-    (current : BallWitnessIndexing M)
-    (request : BallOperationRequest current.Index) :
-    current.next.indexMap request.outputRadius
-        (current.operated request) =
-      request.value M current.indexMap :=
-  rfl
 
 /-- Iterate sortwise witness adjunction through all finite stages. -/
 noncomputable def iterate [Encodable Symbol]
@@ -125,17 +92,6 @@ noncomputable def iterate [Encodable Symbol]
   | 0 => initial
   | n + 1 => (initial.iterate n).next
 
-@[simp]
-theorem iterate_zero [Encodable Symbol]
-    (initial : BallWitnessIndexing M) :
-    initial.iterate 0 = initial :=
-  rfl
-
-@[simp]
-theorem iterate_succ [Encodable Symbol]
-    (initial : BallWitnessIndexing M) (n : ℕ) :
-    initial.iterate (n + 1) = (initial.iterate n).next :=
-  rfl
 
 /-- Lift one index from a stage to its immediate successor. -/
 def oldAtStage [Encodable Symbol] (initial : BallWitnessIndexing M)

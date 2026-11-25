@@ -26,12 +26,6 @@ def scaledOrderViolationTruth (c : ℝ) (hc : 0 ≤ c)
   · norm_num
   · nlinarith [(values 0).2.2, (values 1).2.1]
 
-@[simp]
-theorem scaledOrderViolationTruth_coe (c : ℝ) (hc : 0 ≤ c)
-    (values : Fin 2 → TruthValue) :
-    (scaledOrderViolationTruth c hc values : ℝ) =
-      max 0 ((values 0 : ℝ) - c * (values 1 : ℝ)) :=
-  rfl
 
 /-- The scaled order violation as a binary continuous connective. -/
 def scaledOrderViolationConnective (c : ℝ) (hc : 0 ≤ c) : Connective 2 where

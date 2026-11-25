@@ -149,57 +149,11 @@ variable {E : ℕ → Type*}
 variable [∀ i, NormedAddCommGroup (E i)] [∀ i, NormedSpace ℝ (E i)]
 variable [∀ i, FiniteDimensional ℝ (E i)]
 
-/-- Conditional only on the explicitly isolated weak compactness input, the
-two scalar iterated limits of the norm kernel on a dependent `ℓ₂`-sum agree.
-Every analytic and subsequence step after compactness is discharged here. -/
-theorem iterated_norm_limits_eq_of_weakSequentialCompactness
-    (hcompact : WeakSequentialCompactnessOnBounded (lp E 2))
-    {xSeq ySeq : ℕ → lp E 2} {Cx Cy firstLimit secondLimit : ℝ}
-    (hxBounded : ∀ m, ‖xSeq m‖ ≤ Cx)
-    (hyBounded : ∀ n, ‖ySeq n‖ ≤ Cy)
-    (hFirst : HasSuccessiveLimit (fun m n ↦ ‖xSeq m + ySeq n‖) firstLimit)
-    (hSecond : HasSuccessiveLimit (fun n m ↦ ‖xSeq m + ySeq n‖) secondLimit) :
-    firstLimit = secondLimit := by
-  obtain ⟨x, φ, xLimit, hφ, hxWeak, hxNorm, hxDiffBound⟩ :=
-    hcompact.exists_prepared_subsequence xSeq Cx hxBounded
-  obtain ⟨y, ψ, yLimit, hψ, hyWeak, hyNorm, hyDiffBound⟩ :=
-    hcompact.exists_prepared_subsequence ySeq Cy hyBounded
-  obtain ⟨hInnerFirst, hOuterFirst, hInnerSecond, hOuterSecond⟩ :=
-    iterated_norm_limits_of_weaklyTendsto
-      hxWeak hyWeak hxDiffBound hyDiffBound hxNorm hyNorm
-  let common := pythagoreanDoubleLimit x y xLimit yLimit
-  have hAnalyticFirst : HasSuccessiveLimit
-      (fun m n ↦ ‖xSeq (φ m) + ySeq (ψ n)‖) common :=
-    ⟨fun m ↦ Real.sqrt (‖xSeq (φ m) + y‖ ^ 2 + yLimit ^ 2),
-      hInnerFirst, hOuterFirst⟩
-  have hInheritedFirst := hFirst.subseq hφ hψ
-  have hFirstEq : firstLimit = common :=
-    hInheritedFirst.unique hAnalyticFirst
-  have hAnalyticSecond : HasSuccessiveLimit
-      (fun n m ↦ ‖xSeq (φ m) + ySeq (ψ n)‖) common :=
-    ⟨fun n ↦ Real.sqrt (‖x + ySeq (ψ n)‖ ^ 2 + xLimit ^ 2),
-      hInnerSecond, hOuterSecond⟩
-  have hInheritedSecond := hSecond.subseq hψ hφ
-  have hSecondEq : secondLimit = common :=
-    hInheritedSecond.unique hAnalyticSecond
-  exact hFirstEq.trans hSecondEq.symm
 
 end L2Sum
 
 namespace X
 
-/-- The paper's double-limit conclusion for `XSpace`, conditional only on the
-weak sequential compactness of bounded subsets of `XSpace`. -/
-theorem iterated_norm_limits_eq_of_weakSequentialCompactness
-    (hcompact : WeakSequentialCompactnessOnBounded XSpace)
-    {xSeq ySeq : ℕ → XSpace} {Cx Cy firstLimit secondLimit : ℝ}
-    (hxBounded : ∀ m, ‖xSeq m‖ ≤ Cx)
-    (hyBounded : ∀ n, ‖ySeq n‖ ≤ Cy)
-    (hFirst : HasSuccessiveLimit (fun m n ↦ ‖xSeq m + ySeq n‖) firstLimit)
-    (hSecond : HasSuccessiveLimit (fun n m ↦ ‖xSeq m + ySeq n‖) secondLimit) :
-    firstLimit = secondLimit :=
-  NormFormula.iterated_norm_limits_eq_of_weakSequentialCompactness
-    hcompact hxBounded hyBounded hFirst hSecond
 
 end X
 

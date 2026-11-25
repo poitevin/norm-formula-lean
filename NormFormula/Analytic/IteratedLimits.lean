@@ -72,74 +72,11 @@ theorem tendsto_norm_add_of_weaklyTendsto
   simpa only [Real.sqrt_sq_eq_abs,
     abs_of_nonneg (norm_nonneg _)] using hsqrt
 
-/-- The common value produced by the two Pythagorean successive-limit
-calculations. -/
-def pythagoreanDoubleLimit (x y : lp E 2) (xLimit yLimit : ℝ) : ℝ :=
-  Real.sqrt (‖x + y‖ ^ 2 + xLimit ^ 2 + yLimit ^ 2)
-
-/-- Under chosen weak limits and limits of the difference norms, both
-successive norm-limit calculations exist and converge to the same explicit
-Pythagorean value.  This is the analytic core of the paper's double-limit
-argument, before reflexive subsequence extraction and the model-theoretic
-double-limit criterion are invoked. -/
-theorem iterated_norm_limits_of_weaklyTendsto
-    {xSeq ySeq : ℕ → lp E 2} {x y : lp E 2}
-    {Cx Cy xLimit yLimit : ℝ}
-    (hxWeak : WeaklyTendsto xSeq atTop x)
-    (hyWeak : WeaklyTendsto ySeq atTop y)
-    (hxBounded : ∀ m, ‖xSeq m - x‖ ≤ Cx)
-    (hyBounded : ∀ n, ‖ySeq n - y‖ ≤ Cy)
-    (hxNorm : Tendsto (fun m ↦ ‖xSeq m - x‖) atTop (𝓝 xLimit))
-    (hyNorm : Tendsto (fun n ↦ ‖ySeq n - y‖) atTop (𝓝 yLimit)) :
-    (∀ m, Tendsto (fun n ↦ ‖xSeq m + ySeq n‖) atTop
-      (𝓝 (Real.sqrt (‖xSeq m + y‖ ^ 2 + yLimit ^ 2)))) ∧
-    Tendsto (fun m ↦ Real.sqrt (‖xSeq m + y‖ ^ 2 + yLimit ^ 2)) atTop
-      (𝓝 (pythagoreanDoubleLimit x y xLimit yLimit)) ∧
-    (∀ n, Tendsto (fun m ↦ ‖xSeq m + ySeq n‖) atTop
-      (𝓝 (Real.sqrt (‖x + ySeq n‖ ^ 2 + xLimit ^ 2)))) ∧
-    Tendsto (fun n ↦ Real.sqrt (‖x + ySeq n‖ ^ 2 + xLimit ^ 2)) atTop
-      (𝓝 (pythagoreanDoubleLimit x y xLimit yLimit)) := by
-  refine ⟨fun m ↦ tendsto_norm_add_of_weaklyTendsto
-      (xSeq m) hyWeak hyBounded hyNorm, ?_, ?_, ?_⟩
-  · have hxSq := tendsto_norm_add_sq_of_weaklyTendsto
-      y hxWeak hxBounded hxNorm
-    have hxPlus := hxSq.add_const (yLimit ^ 2)
-    have hxSqrt := Real.continuous_sqrt.continuousAt.tendsto.comp hxPlus
-    simpa [pythagoreanDoubleLimit, add_comm] using hxSqrt
-  · intro n
-    simpa [add_comm] using
-      (tendsto_norm_add_of_weaklyTendsto
-        (ySeq n) hxWeak hxBounded hxNorm)
-  · have hySq := tendsto_norm_add_sq_of_weaklyTendsto
-      x hyWeak hyBounded hyNorm
-    have hyPlus := hySq.add_const (xLimit ^ 2)
-    have hySqrt := Real.continuous_sqrt.continuousAt.tendsto.comp hyPlus
-    simpa [pythagoreanDoubleLimit, add_comm, add_left_comm, add_assoc] using hySqrt
 
 end L2Sum
 
 namespace X
 
-/-- The two successive-limit calculations specialized to `XSpace`. -/
-theorem iterated_norm_limits_of_weaklyTendsto
-    {xSeq ySeq : ℕ → XSpace} {x y : XSpace}
-    {Cx Cy xLimit yLimit : ℝ}
-    (hxWeak : WeaklyTendsto xSeq atTop x)
-    (hyWeak : WeaklyTendsto ySeq atTop y)
-    (hxBounded : ∀ m, ‖xSeq m - x‖ ≤ Cx)
-    (hyBounded : ∀ n, ‖ySeq n - y‖ ≤ Cy)
-    (hxNorm : Tendsto (fun m ↦ ‖xSeq m - x‖) atTop (𝓝 xLimit))
-    (hyNorm : Tendsto (fun n ↦ ‖ySeq n - y‖) atTop (𝓝 yLimit)) :
-    (∀ m, Tendsto (fun n ↦ ‖xSeq m + ySeq n‖) atTop
-      (𝓝 (Real.sqrt (‖xSeq m + y‖ ^ 2 + yLimit ^ 2)))) ∧
-    Tendsto (fun m ↦ Real.sqrt (‖xSeq m + y‖ ^ 2 + yLimit ^ 2)) atTop
-      (𝓝 (pythagoreanDoubleLimit x y xLimit yLimit)) ∧
-    (∀ n, Tendsto (fun m ↦ ‖xSeq m + ySeq n‖) atTop
-      (𝓝 (Real.sqrt (‖x + ySeq n‖ ^ 2 + xLimit ^ 2)))) ∧
-    Tendsto (fun n ↦ Real.sqrt (‖x + ySeq n‖ ^ 2 + xLimit ^ 2)) atTop
-      (𝓝 (pythagoreanDoubleLimit x y xLimit yLimit)) :=
-  NormFormula.iterated_norm_limits_of_weaklyTendsto
-    hxWeak hyWeak hxBounded hyBounded hxNorm hyNorm
 
 end X
 

@@ -137,23 +137,6 @@ def MultiSameCompleteTheory {Symbol : Type w}
 
 namespace MultiSameCompleteTheory
 
-theorem refl {Symbol : Type w} (M : MultiStructure Symbol) :
-    MultiSameCompleteTheory M M := by
-  intro φ
-  rfl
-
-theorem symm {Symbol : Type w} {M N : MultiStructure Symbol}
-    (h : MultiSameCompleteTheory M N) :
-    MultiSameCompleteTheory N M := by
-  intro φ
-  exact (h φ).symm
-
-theorem trans {Symbol : Type w} {M N P : MultiStructure Symbol}
-    (hMN : MultiSameCompleteTheory M N)
-    (hNP : MultiSameCompleteTheory N P) :
-    MultiSameCompleteTheory M P := by
-  intro φ
-  exact (hMN φ).trans (hNP φ)
 
 end MultiSameCompleteTheory
 
@@ -237,39 +220,11 @@ theorem realize_map_reduct
       simp only [map, realize]
       exact iInf_congr fun y ↦ ih rows (Fin.cons y parameters)
 
-/-- Binary real-valued interpretation is preserved by mapping a formula into
-an expansion and reducing the structure along the same language map. -/
-@[simp]
-theorem binaryValue_map_reduct
-    {Symbol : Type w} {Target : Type w'}
-    (f : Symbol → Target) (M : MultiStructure Target)
-    (φ : MultiFormula Symbol 1 1) (x : M.Row) (y : M.Parameter) :
-    (φ.map f).binaryValue M x y = φ.binaryValue (M.reduct f) x y := by
-  exact congrArg (fun value : TruthValue ↦ (value : ℝ))
-    (realize_map_reduct f M φ (fun _ ↦ x) (fun _ ↦ y))
 
 end MultiFormula
 
 namespace MultiSameCompleteTheory
 
-/-- Equality of complete theories descends along every map of predicate
-languages. -/
-theorem reduct
-    {Symbol : Type w} {Target : Type w'}
-    {M : MultiStructure.{u, v, w'} Target}
-    {N : MultiStructure.{u', v', w'} Target}
-    (f : Symbol → Target) (hTheory : MultiSameCompleteTheory M N) :
-    MultiSameCompleteTheory (M.reduct f) (N.reduct f) := by
-  intro φ
-  change φ.realize (M.reduct f) Fin.elim0 Fin.elim0 =
-    φ.realize (N.reduct f) Fin.elim0 Fin.elim0
-  calc
-    φ.realize (M.reduct f) Fin.elim0 Fin.elim0 =
-        (φ.map f).realize M Fin.elim0 Fin.elim0 :=
-      (MultiFormula.realize_map_reduct f M φ Fin.elim0 Fin.elim0).symm
-    _ = (φ.map f).realize N Fin.elim0 Fin.elim0 := hTheory (φ.map f)
-    _ = φ.realize (N.reduct f) Fin.elim0 Fin.elim0 :=
-      MultiFormula.realize_map_reduct f N φ Fin.elim0 Fin.elim0
 
 end MultiSameCompleteTheory
 

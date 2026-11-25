@@ -151,22 +151,6 @@ theorem continuous_localTypeValue {Symbol : Type w}
     Continuous (localTypeValue (M := M) (φ := φ) row) :=
   continuous_subtype_val.comp (continuous_localTypeTruthValue row)
 
-/-- A row, viewed as a continuous real-valued function on the local parameter
-type space. -/
-def localTypeEvaluation {Symbol : Type w}
-    {M : MultiStructure.{u, v, w} Symbol}
-    {φ : MultiFormula Symbol 1 1} (row : M.Row) :
-    C(LocalParameterType M φ, ℝ) :=
-  ⟨localTypeValue row, continuous_localTypeValue row⟩
-
-@[simp]
-theorem localTypeTruthValue_homeParameterType {Symbol : Type w}
-    (M : MultiStructure.{u, v, w} Symbol)
-    (φ : MultiFormula Symbol 1 1) (row : M.Row)
-    (parameter : M.Parameter) :
-    localTypeTruthValue row (homeParameterType M φ parameter) =
-      φ.realize M (fun _ ↦ row) (fun _ ↦ parameter) :=
-  rfl
 
 @[simp]
 theorem localTypeValue_homeParameterType {Symbol : Type w}
@@ -177,13 +161,6 @@ theorem localTypeValue_homeParameterType {Symbol : Type w}
       φ.binaryValue M row parameter :=
   rfl
 
-@[simp]
-theorem localTypeEvaluation_apply {Symbol : Type w}
-    {M : MultiStructure.{u, v, w} Symbol}
-    {φ : MultiFormula Symbol 1 1} (row : M.Row)
-    (type : LocalParameterType M φ) :
-    localTypeEvaluation row type = localTypeValue row type :=
-  rfl
 
 /-- The subtype topology on the local type space is precisely pointwise
 convergence of all formula-evaluation coordinates. -/
@@ -305,106 +282,6 @@ section Map
 
 universe u' v' w'
 
-/-- Restrict a truth-value profile along a map of row sorts. -/
-def restrictProfile
-    {Row : Type u} {TargetRow : Type u'}
-    (rowMap : TargetRow → Row) (profile : Row → TruthValue) :
-    TargetRow → TruthValue :=
-  fun row ↦ profile (rowMap row)
-
-/-- Profile restriction is continuous for the pointwise product topologies. -/
-theorem continuous_restrictProfile
-    {Row : Type u} {TargetRow : Type u'}
-    (rowMap : TargetRow → Row) :
-    Continuous (restrictProfile rowMap) := by
-  apply continuous_pi
-  intro row
-  exact continuous_apply (rowMap row)
-
-/-- A row map and a compatible home-parameter map induce a continuous map of
-local parameter type spaces. The source formula is evaluated after mapping a
-target row into the source row sort; on home parameters this must agree with
-the target formula. -/
-def localParameterTypeMap
-    {Symbol : Type w} {TargetSymbol : Type w'}
-    {M : MultiStructure.{u, v, w} Symbol}
-    {N : MultiStructure.{u', v', w'} TargetSymbol}
-    {φ : MultiFormula Symbol 1 1}
-    {ψ : MultiFormula TargetSymbol 1 1}
-    (rowMap : N.Row → M.Row) (parameterMap : M.Parameter → N.Parameter)
-    (hcompat : ∀ row parameter,
-      parameterProfile N ψ (parameterMap parameter) row =
-        parameterProfile M φ parameter (rowMap row)) :
-    LocalParameterType M φ → LocalParameterType N ψ := by
-  intro type
-  refine ⟨restrictProfile rowMap type.1, ?_⟩
-  have hclosureImage :
-      restrictProfile rowMap type.1 ∈
-        closure (restrictProfile rowMap ''
-          Set.range (parameterProfile M φ)) :=
-    image_closure_subset_closure_image
-      (continuous_restrictProfile rowMap) ⟨type.1, type.2, rfl⟩
-  apply closure_mono (s := restrictProfile rowMap ''
-      Set.range (parameterProfile M φ)) (t := Set.range (parameterProfile N ψ))
-      ?_ hclosureImage
-  rintro _ ⟨_, ⟨parameter, rfl⟩, rfl⟩
-  exact ⟨parameterMap parameter, funext fun row ↦ by
-    simpa [restrictProfile] using hcompat row parameter⟩
-
-/-- The induced map of local type spaces is continuous. -/
-theorem continuous_localParameterTypeMap
-    {Symbol : Type w} {TargetSymbol : Type w'}
-    {M : MultiStructure.{u, v, w} Symbol}
-    {N : MultiStructure.{u', v', w'} TargetSymbol}
-    {φ : MultiFormula Symbol 1 1}
-    {ψ : MultiFormula TargetSymbol 1 1}
-    (rowMap : N.Row → M.Row) (parameterMap : M.Parameter → N.Parameter)
-    (hcompat : ∀ row parameter,
-      parameterProfile N ψ (parameterMap parameter) row =
-        parameterProfile M φ parameter (rowMap row)) :
-    Continuous (localParameterTypeMap rowMap parameterMap hcompat) := by
-  apply continuous_induced_rng.2
-  change Continuous fun type : LocalParameterType M φ ↦
-    restrictProfile rowMap type.1
-  exact (continuous_restrictProfile rowMap).comp continuous_subtype_val
-
-@[simp]
-theorem localTypeValue_localParameterTypeMap
-    {Symbol : Type w} {TargetSymbol : Type w'}
-    {M : MultiStructure.{u, v, w} Symbol}
-    {N : MultiStructure.{u', v', w'} TargetSymbol}
-    {φ : MultiFormula Symbol 1 1}
-    {ψ : MultiFormula TargetSymbol 1 1}
-    (rowMap : N.Row → M.Row) (parameterMap : M.Parameter → N.Parameter)
-    (hcompat : ∀ row parameter,
-      parameterProfile N ψ (parameterMap parameter) row =
-        parameterProfile M φ parameter (rowMap row))
-    (row : N.Row) (type : LocalParameterType M φ) :
-    localTypeValue row
-        (localParameterTypeMap rowMap parameterMap hcompat type) =
-      localTypeValue (rowMap row) type :=
-  rfl
-
-@[simp]
-theorem localParameterTypeMap_homeParameterType
-    {Symbol : Type w} {TargetSymbol : Type w'}
-    {M : MultiStructure.{u, v, w} Symbol}
-    {N : MultiStructure.{u', v', w'} TargetSymbol}
-    {φ : MultiFormula Symbol 1 1}
-    {ψ : MultiFormula TargetSymbol 1 1}
-    (rowMap : N.Row → M.Row) (parameterMap : M.Parameter → N.Parameter)
-    (hcompat : ∀ row parameter,
-      parameterProfile N ψ (parameterMap parameter) row =
-        parameterProfile M φ parameter (rowMap row))
-    (parameter : M.Parameter) :
-    localParameterTypeMap rowMap parameterMap hcompat
-        (homeParameterType M φ parameter) =
-      homeParameterType N ψ (parameterMap parameter) := by
-  apply Subtype.ext
-  funext row
-  change parameterProfile M φ parameter (rowMap row) =
-    parameterProfile N ψ (parameterMap parameter) row
-  exact (hcompat row parameter).symm
 
 end Map
 

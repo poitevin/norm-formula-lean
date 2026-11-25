@@ -132,11 +132,6 @@ noncomputable def xInY (i : ℕ) : Y := ⟨xVector i⟩
 /-- The second-coordinate basis sequence, now regarded as a sequence in the normed space `Y`. -/
 noncomputable def yInY (j : ℕ) : Y := ⟨yVector j⟩
 
-@[simp]
-theorem xInY_toHilbert (i : ℕ) : (xInY i).toHilbert = xVector i := rfl
-
-@[simp]
-theorem yInY_toHilbert (j : ℕ) : (yInY j).toHilbert = yVector j := rfl
 
 /-- The half-graph stated using the ordinary norm of the actual normed space `Y`. -/
 theorem norm_xInY_add_yInY (i j : ℕ) :

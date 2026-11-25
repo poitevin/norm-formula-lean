@@ -55,15 +55,6 @@ theorem normTranslate_hasIPPatternsInEveryDimension :
   intro i
   rw [norm_rowInX]
 
-/-- Consequently the stronger bounded finite-pattern property used to imply
-complete-theory NIP does not hold for the norm on `X`.  This does not conflict
-with the paper's separate local-stability theorem for the distinguished
-space. -/
-theorem normTranslate_not_isBoundedLocalNIP :
-    ¬ NormFormula.IsBoundedLocalNIP normTranslate := by
-  intro hlocal
-  exact (hlocal.not_hasIPPatternsInEveryDimension sqrtThree_lt_sqrtSix)
-    normTranslate_hasIPPatternsInEveryDimension
 
 end
 

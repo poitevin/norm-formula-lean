@@ -29,15 +29,6 @@ def includeLimitBallAssignment [Encodable Symbol]
       BallTerm.Assignment M.toRationalBallSystem context :=
   fun assignment i ↦ initial.limitBallInclusion (context i) (assignment i)
 
-@[simp]
-theorem includeLimitBallAssignment_apply [Encodable Symbol]
-    (initial : BallWitnessIndexing M)
-    {n : ℕ} {context : BallContext n}
-    (assignment : BallTerm.Assignment
-      initial.limitRationalBallSystem context) (i : Fin n) :
-    initial.includeLimitBallAssignment assignment i =
-      initial.limitBallInclusion (context i) (assignment i) :=
-  rfl
 
 /-- Evaluation of every typed term commutes with inclusion of the closed
 generated carriers into the ambient ball structure. -/

@@ -290,13 +290,6 @@ def ballToStandardNormBall (A : XBallTheoryModel.{u}) (radius : ℚ≥0) :
   fun x ↦ ⟨A.ballToCompletedDirectedPoint radius x,
     A.norm_ballToCompletedDirectedPoint_le_radius radius x⟩
 
-@[simp]
-theorem ballToStandardNormBall_coe
-    (A : XBallTheoryModel.{u}) (radius : ℚ≥0)
-    (x : A.model.Ball radius) :
-    (A.ballToStandardNormBall radius x : A.CompletedDirectedPoint) =
-      A.ballToCompletedDirectedPoint radius x :=
-  rfl
 
 /-- Every actual point of the reconstructed closed radius-`r` ball has an
 exact representative in the corresponding typed sort. -/
@@ -662,9 +655,6 @@ theorem predicateFreeNormAddFormula_hasInfiniteIPWitness_of_completed
     rw [hbound]
     exact div_le_div_of_nonneg_right (hhigh i hi) (by norm_num)
 
-theorem normalizedSqrtThree_sixteen_lt_normalizedSqrtSix :
-    Real.sqrt 3 / 16 < Real.sqrt 6 / 16 :=
-  div_lt_div_of_pos_right NormFormula.X.sqrtThree_lt_sqrtSix (by norm_num)
 
 /-- The standard radius-`2` norm formula carries the paper's original gap. -/
 theorem predicateFreeNormAddFormula_hasInfiniteIPWitness_of_completed_two
@@ -701,9 +691,6 @@ theorem predicateFreeNormAddFormula_hasInfiniteIPWitness_of_completed_two
     rw [hbound]
     exact div_le_div_of_nonneg_right (hhigh i hi) (by norm_num)
 
-theorem normalizedSqrtThree_eight_lt_normalizedSqrtSix :
-    Real.sqrt 3 / 8 < Real.sqrt 6 / 8 :=
-  div_lt_div_of_pos_right NormFormula.X.sqrtThree_lt_sqrtSix (by norm_num)
 
 end XBallTheoryModel
 

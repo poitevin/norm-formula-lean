@@ -46,11 +46,6 @@ def hilbertNormTruth (r : ℚ≥0) (x : RationalNormBall XSpace r) :
       linarith
     _ ≤ max 1 (2 * (r : ℝ)) := le_max_right _ _
 
-@[simp]
-theorem hilbertNormTruth_coe (r : ℚ≥0) (x : RationalNormBall XSpace r) :
-    (hilbertNormTruth r x : ℝ) =
-      ‖toHilbert x.1‖ / rationalBallMetricBound r :=
-  rfl
 
 /-- Uniform continuity of the normalized auxiliary Hilbert predicate. -/
 theorem hilbertNormTruth_uniformContinuous (r : ℚ≥0) :

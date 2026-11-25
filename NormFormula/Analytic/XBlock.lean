@@ -284,14 +284,6 @@ theorem blockSeminorm_row_add_subset_of_not_mem {n : ℕ} (i : Fin n)
         simpa [p] using pairSeminorm_le_blockSeminorm p
           (rowVector i + subsetVector S)
 
-/-- Complete computation of `M_n(f_i + e_S)`. -/
-theorem blockSeminorm_row_add_subset {n : ℕ} (i : Fin n)
-    (S : Finset (Fin n)) :
-    blockSeminorm n (rowVector i + subsetVector S) =
-      if i ∈ S then 2 else 1 := by
-  split_ifs with hi
-  · exact blockSeminorm_row_add_subset_of_mem i S hi
-  · exact blockSeminorm_row_add_subset_of_not_mem i S hi
 
 /-- Exact high cube value. -/
 theorem blockNorm_row_add_subset_of_mem {n : ℕ} (i : Fin n)

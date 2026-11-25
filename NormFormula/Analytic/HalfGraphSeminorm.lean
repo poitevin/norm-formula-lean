@@ -146,11 +146,5 @@ theorem yNorm_midpoint_sq_le {x y : HilbertSpace}
       1 - (1 / 12 : ℝ) * yNorm (x - y) ^ 2 :=
   augmentedNorm_midpoint_sq_le qSeminorm qSeminorm_sq_le_two_mul_norm_sq hx hy
 
-/-- The `Y`-norm bundled as a seminorm for subsequent constructions. -/
-noncomputable def ySeminorm : Seminorm ℝ HilbertSpace :=
-  augmentedSeminorm qSeminorm
-
-@[simp]
-theorem ySeminorm_apply (z : HilbertSpace) : ySeminorm z = yNorm z := rfl
 
 end NormFormula.HalfGraph

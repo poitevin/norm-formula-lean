@@ -180,17 +180,6 @@ def standardRationalBallSystem [NormedSpace ℝ E] [CompleteSpace E] :
   add_uniformContinuous := rationalBallAdd_uniformContinuous
   smul_uniformContinuous := rationalBallSmul_uniformContinuous
 
-/-- The metric diameter of the `r`-ball is bounded by the chosen positive
-scale. -/
-theorem rationalBall_dist_le_metricBound (r : ℚ≥0)
-    (x y : RationalNormBall E r) :
-    dist x y ≤ rationalBallMetricBound r := by
-  rw [Subtype.dist_eq, dist_eq_norm]
-  calc
-    ‖x.1 - y.1‖ ≤ ‖x.1‖ + ‖y.1‖ := norm_sub_le _ _
-    _ ≤ (r : ℝ) + (r : ℝ) := add_le_add x.2 y.2
-    _ = 2 * (r : ℝ) := by ring
-    _ ≤ max 1 (2 * (r : ℝ)) := le_max_right _ _
 
 /-- Rational-radius balls cover the whole ambient normed space. -/
 theorem exists_rationalNormBall (x : E) :
@@ -199,33 +188,6 @@ theorem exists_rationalNormBall (x : E) :
   refine ⟨(n : ℚ≥0), ⟨x, ?_⟩, rfl⟩
   simpa using hn
 
-@[simp]
-theorem rationalBallInclusion_coe {r s : ℚ≥0} (h : r ≤ s)
-    (x : RationalNormBall E r) :
-    (rationalBallInclusion (E := E) h x : E) = x :=
-  rfl
-
-@[simp]
-theorem rationalBallZero_coe (r : ℚ≥0) :
-    (rationalBallZero (E := E) r : E) = 0 :=
-  rfl
-
-@[simp]
-theorem rationalBallNeg_coe (r : ℚ≥0) (x : RationalNormBall E r) :
-    (rationalBallNeg (E := E) r x : E) = -x :=
-  rfl
-
-@[simp]
-theorem rationalBallAdd_coe (r s : ℚ≥0)
-    (p : RationalNormBall E r × RationalNormBall E s) :
-    (rationalBallAdd (E := E) r s p : E) = p.1.1 + p.2.1 :=
-  rfl
-
-@[simp]
-theorem rationalBallSmul_coe [NormedSpace ℝ E] (q : ℚ) (r : ℚ≥0)
-    (x : RationalNormBall E r) :
-    (rationalBallSmul (E := E) q r x : E) = (q : ℝ) • x :=
-  rfl
 
 /-- Nested inclusions agree pointwise, the first coherence law needed by the
 typed term semantics. -/
@@ -236,12 +198,6 @@ theorem rationalBallInclusion_trans {r s t : ℚ≥0}
       rationalBallInclusion (E := E) (hrs.trans hst) x := by
   rfl
 
-/-- Inclusion commutes with negation. -/
-theorem rationalBallInclusion_neg {r s : ℚ≥0} (h : r ≤ s)
-    (x : RationalNormBall E r) :
-    rationalBallInclusion (E := E) h (rationalBallNeg (E := E) r x) =
-      rationalBallNeg (E := E) s (rationalBallInclusion (E := E) h x) := by
-  rfl
 
 /-- Inclusion commutes with addition. -/
 theorem rationalBallInclusion_add {r r' s s' : ℚ≥0}

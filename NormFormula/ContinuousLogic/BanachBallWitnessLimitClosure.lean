@@ -40,13 +40,6 @@ def limitPoint [Encodable Symbol] (initial : BallWitnessIndexing M)
   ⟨initial.limitMap radius index,
     subset_closure (Set.mem_range_self index)⟩
 
-@[simp]
-theorem limitPoint_val [Encodable Symbol]
-    (initial : BallWitnessIndexing M) (radius : ℚ≥0)
-    (index : initial.LimitIndex radius) :
-    (initial.limitPoint radius index : M.Ball radius) =
-      initial.limitMap radius index :=
-  rfl
 
 /-- Canonical limit points are dense in the closed carrier of each rational
 radius. -/

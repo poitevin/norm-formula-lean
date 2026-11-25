@@ -49,92 +49,6 @@ def ThresholdPairIndependent {α : Type*} (values : ℕ → α → ℝ)
       (∀ i ∈ E, values i point ≤ low) ∧
       (∀ i ∈ F, high ≤ values i point)
 
-/-- Realization of one finite ordered binary low/high pattern. A `false` bit
-asks for the low inequality and a `true` bit for the high inequality. -/
-def FiniteBinaryPatternRealized {α : Type*} (values : ℕ → α → ℝ)
-    (low high : ℝ) {k : ℕ} (word : Fin k → Bool)
-    (indices : Fin k → ℕ) : Prop :=
-  ∃ point : α, ∀ i,
-    if word i = true then high ≤ values (indices i) point
-    else values (indices i) point ≤ low
-
-/-- If every finite ordered binary pattern is realized on every increasing
-tuple, the low/high level-set pairs form an independent sequence. -/
-theorem thresholdPairIndependent_of_all_finiteBinaryPatternsRealized
-    {α : Type*} {values : ℕ → α → ℝ} {low high : ℝ}
-    (hall : ∀ (k : ℕ) (word : Fin k → Bool)
-      (indices : Fin k → ℕ), StrictMono indices →
-        FiniteBinaryPatternRealized values low high word indices) :
-    ThresholdPairIndependent values low high := by
-  classical
-  intro E F hdisjoint
-  let support : Finset ℕ := E ∪ F
-  let indices : Fin support.card ↪o ℕ :=
-    support.orderEmbOfFin rfl
-  let word : Fin support.card → Bool :=
-    fun i ↦ decide (indices i ∈ F)
-  obtain ⟨point, hpoint⟩ :=
-    hall support.card word indices indices.strictMono
-  refine ⟨point, ?_, ?_⟩
-  · intro i hiE
-    have hiSupport : i ∈ support := Finset.mem_union_left F hiE
-    have hiRange : i ∈ Set.range (indices : Fin support.card → ℕ) := by
-      rw [Finset.range_orderEmbOfFin]
-      exact hiSupport
-    obtain ⟨j, hj⟩ := hiRange
-    have hiNotF : i ∉ F :=
-      Finset.disjoint_left.mp hdisjoint hiE
-    have hword : word j = false := by
-      simp [word, hj, hiNotF]
-    simpa only [hword, Bool.false_eq_true, ↓reduceIte, hj] using hpoint j
-  · intro i hiF
-    have hiSupport : i ∈ support := Finset.mem_union_right E hiF
-    have hiRange : i ∈ Set.range (indices : Fin support.card → ℕ) := by
-      rw [Finset.range_orderEmbOfFin]
-      exact hiSupport
-    obtain ⟨j, hj⟩ := hiRange
-    have hword : word j = true := by
-      simp [word, hj, hiF]
-    simpa only [hword, ↓reduceIte, hj] using hpoint j
-
-/-- If each of two labels occurs frequently, any prescribed finite word in
-the labels can be found at strictly increasing indices. -/
-theorem exists_strictMono_fin_satisfying_of_frequently
-    {predicate : Bool → ℕ → Prop}
-    (hfrequent : ∀ bit, ∃ᶠ n in atTop, predicate bit n)
-    {k : ℕ} (word : Fin k → Bool) :
-    ∃ indices : Fin k → ℕ, StrictMono indices ∧
-      ∀ i, predicate (word i) (indices i) := by
-  induction word using Fin.snocInduction with
-  | elim0 =>
-      exact ⟨Fin.elim0, fun i ↦ Fin.elim0 i,
-        fun i ↦ Fin.elim0 i⟩
-  | snoc initial bit ih =>
-      obtain ⟨indices, hindices, hholds⟩ := ih
-      have habove : ∀ᶠ next in atTop, ∀ i, indices i < next := by
-        rw [eventually_all]
-        exact fun i ↦ eventually_gt_atTop (indices i)
-      obtain ⟨next, hnextAbove, hnext⟩ :=
-        (habove.and_frequently (hfrequent bit)).exists
-      refine ⟨Fin.snoc indices next, ?_, ?_⟩
-      · intro i j hij
-        induction i using Fin.lastCases with
-        | cast i =>
-            induction j using Fin.lastCases with
-            | cast j =>
-                simpa only [Fin.snoc_castSucc] using
-                  hindices (by simpa only [Fin.castSucc_lt_castSucc_iff] using hij)
-            | last =>
-                simpa only [Fin.snoc_castSucc, Fin.snoc_last] using
-                  hnextAbove i
-        | last =>
-            exact (not_lt_of_ge (Fin.le_last j) hij).elim
-      · intro i
-        induction i using Fin.lastCases with
-        | cast i =>
-            simpa only [Fin.snoc_castSucc] using hholds i
-        | last =>
-            simpa only [Fin.snoc_last] using hnext
 
 /-- A position-dependent sequence of frequent predicates can be met along one
 strictly increasing sequence. At each step choose a witness beyond the
@@ -344,12 +258,6 @@ def BFTPointwiseDichotomy (α : Type*) [TopologicalSpace α] : Prop :=
       HasPointwiseConvergentSubsequence values ∨
         HasIndependentSubsequence values
 
-/-- The remaining standalone topology theorem, separated completely from the
-continuous-logic application: the BFT pointwise dichotomy holds on every
-compact metrizable space. -/
-def CompactMetrizableBFT.{κ} : Prop :=
-  ∀ (α : Type κ) [TopologicalSpace α] [CompactSpace α]
-    [MetrizableSpace α], BFTPointwiseDichotomy α
 
 /-- The elementary compactness half of the BFT dichotomy. A continuous
 independent sequence on a compact space cannot converge pointwise along any
@@ -440,56 +348,6 @@ theorem HasIndependentSequence.no_pointwiseConvergence_along
     le_of_tendsto hoddLimit (Eventually.of_forall hoddBound)
   linarith
 
-/-- In particular, a continuous independent sequence on a compact space has
-no pointwise convergent subsequence. -/
-theorem HasIndependentSequence.no_pointwiseConvergentSubsequence
-    {α : Type*} [TopologicalSpace α] [CompactSpace α]
-    {values : ℕ → α → ℝ}
-    (hindependent : HasIndependentSequence values)
-    (hcontinuous : ∀ n, Continuous (values n)) :
-    ¬ HasPointwiseConvergentSubsequence values := by
-  rintro ⟨subsequence, hsubsequence, hconverges⟩
-  exact hindependent.no_pointwiseConvergence_along
-    hcontinuous subsequence hsubsequence hconverges
-
-/-- On a countable domain, boundedness alone gives a pointwise convergent
-subsequence. Package the functions as a sequence in the compact metrizable
-countable product `[0,1]^α` and apply ordinary sequential compactness. This is
-the diagonal compactness component of the BFT argument. -/
-theorem hasPointwiseConvergentSubsequence_of_countable
-    {α : Type*} [Countable α] {values : ℕ → α → ℝ}
-    (hbounded : ∀ n point, values n point ∈ Set.Icc (0 : ℝ) 1) :
-    HasPointwiseConvergentSubsequence values := by
-  let profiles : ℕ → α → TruthValue :=
-    fun n point ↦ ⟨values n point, hbounded n point⟩
-  letI : MetrizableSpace (α → TruthValue) := inferInstance
-  letI : SeqCompactSpace (α → TruthValue) :=
-    compactSpace_iff_seqCompactSpace.mp inferInstance
-  obtain ⟨profile, subsequence, hsubsequence, hconverges⟩ :=
-    SeqCompactSpace.tendsto_subseq profiles
-  refine ⟨subsequence, hsubsequence, ?_⟩
-  intro point
-  refine ⟨profile point, ?_⟩
-  have hcoordinate : Tendsto
-      (fun n ↦ profiles (subsequence n) point)
-      atTop (𝓝 (profile point)) := by
-    exact tendsto_pi_nhds.mp hconverges point
-  exact continuous_subtype_val.continuousAt.tendsto.comp hcoordinate
-
-/-- Hence the BFT pointwise dichotomy is already fully proved on countable
-spaces; only the extension from a countable dense subset to every point of an
-uncountable compact metrizable space remains genuinely deep. -/
-theorem bftPointwiseDichotomy_of_countable
-    (α : Type*) [TopologicalSpace α] [Countable α] :
-    BFTPointwiseDichotomy α := by
-  intro values _hcontinuous hbounded
-  exact Or.inl (hasPointwiseConvergentSubsequence_of_countable hbounded)
-
-/-- Pointwise convergence of a function sequence on a specified subset. -/
-def ConvergesPointwiseOn {α : Type*} (values : ℕ → α → ℝ)
-    (subset : Set α) : Prop :=
-  ∀ point ∈ subset, ∃ limit : ℝ,
-    Tendsto (fun n ↦ values n point) atTop (𝓝 limit)
 
 /-- Convergence of the disjoint low/high level-set pairs on a subset: at each
 point the sequence eventually avoids the low side or eventually avoids the
@@ -505,33 +363,6 @@ def ThresholdPairConverges {α : Type*} (values : ℕ → α → ℝ)
     (low high : ℝ) : Prop :=
   ThresholdPairConvergesOn values low high Set.univ
 
-/-- Pointwise scalar convergence forces convergence of every strict-threshold
-pair: according to the position of the scalar limit, the sequence eventually
-avoids either the low or the high level set. -/
-theorem ConvergesPointwiseOn.thresholdPairConvergesOn
-    {α : Type*} {values : ℕ → α → ℝ} {subset : Set α}
-    {low high : ℝ} (hgap : low < high)
-    (hconverges : ConvergesPointwiseOn values subset) :
-    ThresholdPairConvergesOn values low high subset := by
-  intro point hpoint
-  obtain ⟨limit, hlimit⟩ := hconverges point hpoint
-  by_cases hlow : low < limit
-  · left
-    exact hlimit.eventually (Ioi_mem_nhds hlow)
-  · right
-    have hlimitHigh : limit < high := (le_of_not_gt hlow).trans_lt hgap
-    exact hlimit.eventually (Iio_mem_nhds hlimitHigh)
-
-/-- The global specialization of the preceding result. -/
-theorem pointwiseConvergence_implies_thresholdPairConvergence
-    {α : Type*} {values : ℕ → α → ℝ} {low high : ℝ}
-    (hgap : low < high)
-    (hconverges : ∀ point : α, ∃ limit : ℝ,
-      Tendsto (fun n ↦ values n point) atTop (𝓝 limit)) :
-    ThresholdPairConverges values low high := by
-  apply ConvergesPointwiseOn.thresholdPairConvergesOn hgap
-  intro point _
-  exact hconverges point
 
 /-- Threshold-pair convergence is inherited by subsequences. -/
 theorem ThresholdPairConvergesOn.comp_strictMono
@@ -745,30 +576,6 @@ def ThresholdPairSubsequenceDichotomy : Prop :=
         ThresholdPairIndependent
           (fun n point ↦ values (subsequence n) point) low high)
 
-/-- If one finite binary word is forbidden on every increasing tuple, then
-the threshold pairs converge. Otherwise a point visiting both the low and
-high sides frequently would realize that word by finite extraction. -/
-theorem thresholdPairConverges_of_forbidden_finiteBinaryPattern
-    {α : Type*} {values : ℕ → α → ℝ} {low high : ℝ}
-    {k : ℕ} {word : Fin k → Bool}
-    (hforbidden : ∀ indices : Fin k → ℕ, StrictMono indices →
-      ¬ FiniteBinaryPatternRealized values low high word indices) :
-    ThresholdPairConverges values low high := by
-  intro point _
-  by_contra hneither
-  push Not at hneither
-  have hlow : ∃ᶠ n in atTop, values n point ≤ low := hneither.1
-  have hhigh : ∃ᶠ n in atTop, high ≤ values n point := hneither.2
-  let predicate : Bool → ℕ → Prop := fun bit n ↦
-    if bit = true then high ≤ values n point else values n point ≤ low
-  have hfrequent : ∀ bit, ∃ᶠ n in atTop, predicate bit n := by
-    intro bit
-    cases bit <;> simp only [predicate, Bool.false_eq_true, ↓reduceIte,
-      hlow, hhigh]
-  obtain ⟨indices, hindices, hpattern⟩ :=
-    exists_strictMono_fin_satisfying_of_frequently hfrequent word
-  apply hforbidden indices hindices
-  exact ⟨point, hpattern⟩
 
 /-- Realization of the alternating low/high word along one finite prefix of
 an infinite index sequence. -/
@@ -842,19 +649,6 @@ def FinitePrefixCylinder {length : ℕ} (stem : Fin length → ℕ) :
     Set (ℕ → ℕ) :=
   {sequence | ∀ i : Fin length, sequence (i : ℕ) = stem i}
 
-/-- Finite-prefix cylinders are open in Baire space. -/
-theorem isOpen_finitePrefixCylinder {length : ℕ}
-    (stem : Fin length → ℕ) :
-    IsOpen (FinitePrefixCylinder stem) := by
-  rw [show FinitePrefixCylinder stem = ⋂ i : Fin length,
-      {sequence : ℕ → ℕ | sequence (i : ℕ) = stem i} by
-    ext sequence
-    simp [FinitePrefixCylinder]]
-  apply isOpen_iInter_of_finite
-  intro i
-  change IsOpen ((fun sequence : ℕ → ℕ ↦ sequence (i : ℕ)) ⁻¹' {stem i})
-  exact (isOpen_discrete ({stem i} : Set ℕ)).preimage
-    (continuous_apply (i : ℕ))
 
 /-- Every point of an open subset of Baire space has a neighborhood obtained
 by fixing one finite initial segment. -/
@@ -1019,42 +813,6 @@ theorem exists_subsequence_prefixAccepts_or_prefixRejects
     refine ⟨further, hfurther, ?_⟩
     simpa only [Function.comp_apply, id_eq] using hfurtherAccepts
 
-/-- After one common thinning, every stem in a finite indexed family is
-decided. Earlier decisions survive the successive thinnings by heredity. -/
-theorem exists_subsequence_decides_finite_prefixes
-    (barrier : ∀ length : ℕ, (Fin length → ℕ) → Prop)
-    (count : ℕ) (stemLength : Fin count → ℕ)
-    (stem : ∀ i : Fin count, Fin (stemLength i) → ℕ)
-    (tail : ℕ → ℕ) :
-    ∃ subsequence : ℕ → ℕ, StrictMono subsequence ∧
-      ∀ i : Fin count,
-        PrefixAccepts barrier (stem i) (tail ∘ subsequence) ∨
-          PrefixRejects barrier (stem i) (tail ∘ subsequence) := by
-  classical
-  induction count with
-  | zero =>
-      exact ⟨id, strictMono_id, fun i ↦ Fin.elim0 i⟩
-  | succ count ih =>
-      let earlierLength : Fin count → ℕ :=
-        fun i ↦ stemLength i.castSucc
-      let earlierStem : ∀ i : Fin count, Fin (earlierLength i) → ℕ :=
-        fun i ↦ stem i.castSucc
-      obtain ⟨subsequence, hsubsequence, hdecidesEarlier⟩ :=
-        ih earlierLength earlierStem
-      obtain ⟨further, hfurther, hdecidesLast⟩ :=
-        exists_subsequence_prefixAccepts_or_prefixRejects barrier
-          (stem (Fin.last count)) (tail ∘ subsequence)
-      refine ⟨subsequence ∘ further, hsubsequence.comp hfurther, ?_⟩
-      intro i
-      refine Fin.lastCases ?_ (fun j ↦ ?_) i
-      · simpa only [Function.comp_apply] using hdecidesLast
-      · obtain haccepts | hrejects := hdecidesEarlier j
-        · exact Or.inl <| by
-            simpa only [Function.comp_apply] using
-              haccepts.subsequence hfurther
-        · exact Or.inr <| by
-            simpa only [Function.comp_apply] using
-              hrejects.subsequence hfurther
 
 /-- The countable type of all finite natural-number stems. Enumerating this
 type lets the fusion decide every possible stem without carrying a dependent
@@ -1192,68 +950,6 @@ theorem exists_strictMono_every_finite_prefix_decided_on_tail
       rw [htail]
       exact hrejects.subsequence hfactor
 
-/-- Starting at `start`, recursively choose indices that move strictly
-forward and escape beyond the prescribed bound at every step. -/
-def escapingSequence (bound : ℕ → ℕ) (start : ℕ) : ℕ → ℕ
-  | 0 => start
-  | n + 1 => max (escapingSequence bound start n + 1)
-      (bound (escapingSequence bound start n))
-
-@[simp]
-theorem escapingSequence_zero (bound : ℕ → ℕ) (start : ℕ) :
-    escapingSequence bound start 0 = start :=
-  rfl
-
-@[simp]
-theorem escapingSequence_succ (bound : ℕ → ℕ) (start n : ℕ) :
-    escapingSequence bound start (n + 1) =
-      max (escapingSequence bound start n + 1)
-        (bound (escapingSequence bound start n)) :=
-  rfl
-
-/-- The escaping sequence is strictly increasing. -/
-theorem escapingSequence_strictMono (bound : ℕ → ℕ) (start : ℕ) :
-    StrictMono (escapingSequence bound start) := by
-  apply strictMono_nat_of_lt_succ
-  intro n
-  rw [escapingSequence_succ]
-  exact (Nat.lt_succ_self _).trans_le (le_max_left _ _)
-
-/-- Every escaping index stays beyond its starting index. -/
-theorem escapingSequence_start_le (bound : ℕ → ℕ) (start n : ℕ) :
-    start ≤ escapingSequence bound start n := by
-  simpa only [escapingSequence_zero] using
-    (escapingSequence_strictMono bound start).monotone (Nat.zero_le n)
-
-/-- The next escaping index lies beyond the bound prescribed at the current
-index. -/
-theorem escapingSequence_bound_le_succ
-    (bound : ℕ → ℕ) (start n : ℕ) :
-    bound (escapingSequence bound start n) ≤
-      escapingSequence bound start (n + 1) := by
-  rw [escapingSequence_succ]
-  exact le_max_right _ _
-
-/-- Subtracting the fixed starting index turns the escaping sequence into a
-strictly increasing subsequence of the ordinary tail enumeration. -/
-theorem escapingSequence_sub_start_strictMono
-    (bound : ℕ → ℕ) (start : ℕ) :
-    StrictMono (fun n ↦ escapingSequence bound start n - start) := by
-  intro m n hmn
-  have hlt := escapingSequence_strictMono bound start hmn
-  have hm := escapingSequence_start_le bound start m
-  exact Nat.sub_lt_sub_right hm hlt
-
-/-- The escaping sequence factors through the tail beginning at `start`. -/
-theorem escapingSequence_factors_through_tail
-    (bound : ℕ → ℕ) (start : ℕ) :
-    escapingSequence bound start =
-      (fun n ↦ start + n) ∘
-        (fun n ↦ escapingSequence bound start n - start) := by
-  funext n
-  simp only [Function.comp_apply]
-  have hn := escapingSequence_start_le bound start n
-  omega
 
 /-- From a cofinal supply of position/cutoff pairs, recursively choose a
 strictly increasing sequence whose next position lies beyond the preceding
@@ -1373,117 +1069,6 @@ theorem exists_barrier_extension_of_prefixAccepts_singleton
     intro i
     rfl
 
-/-- If a stem is hereditarily rejected on one tail of a globally deciding
-sequence, some later one-point extension is again hereditarily rejected.
-Otherwise choose accepting cutoffs for every extension, escape beyond them,
-and obtain an accepted subsequence of the allegedly rejecting tail. -/
-theorem exists_rejected_singleton_extension
-    (barrier : ∀ length : ℕ, (Fin length → ℕ) → Prop)
-    {stemLength : ℕ} (stem : Fin stemLength → ℕ)
-    (diagonal : ℕ → ℕ)
-    (hdecides : ∀ {length : ℕ} (otherStem : Fin length → ℕ),
-      ∃ k : ℕ,
-        PrefixAccepts barrier otherStem
-            (fun n ↦ diagonal (k + n)) ∨
-          PrefixRejects barrier otherStem
-            (fun n ↦ diagonal (k + n)))
-    {start : ℕ}
-    (hrejects : PrefixRejects barrier stem
-      (fun n ↦ diagonal (start + n))) :
-    ∃ position cutoff : ℕ,
-      start ≤ position ∧ position < cutoff ∧
-        PrefixRejects barrier
-          (Fin.append stem (fun _ : Fin 1 ↦ diagonal position))
-          (fun n ↦ diagonal (cutoff + n)) := by
-  classical
-  by_contra hnone
-  have hnoReject : ∀ position cutoff : ℕ,
-      start ≤ position → position < cutoff →
-      ¬ PrefixRejects barrier
-        (Fin.append stem (fun _ : Fin 1 ↦ diagonal position))
-        (fun n ↦ diagonal (cutoff + n)) := by
-    intro position cutoff hposition hcutoff hreject
-    apply hnone
-    exact ⟨position, cutoff, hposition, hcutoff, hreject⟩
-  have haccepted : ∀ position : ℕ, start ≤ position →
-      ∃ cutoff : ℕ, position < cutoff ∧
-        PrefixAccepts barrier
-          (Fin.append stem (fun _ : Fin 1 ↦ diagonal position))
-          (fun n ↦ diagonal (cutoff + n)) := by
-    intro position hposition
-    obtain ⟨decisionCutoff, haccepts | hrejects⟩ :=
-      hdecides (Fin.append stem (fun _ : Fin 1 ↦ diagonal position))
-    · let cutoff := max decisionCutoff (position + 1)
-      refine ⟨cutoff, ?_, haccepts.later_tail (le_max_left _ _)⟩
-      exact (Nat.lt_succ_self position).trans_le (le_max_right _ _)
-    · let cutoff := max decisionCutoff (position + 1)
-      have hpositionCutoff : position < cutoff :=
-        (Nat.lt_succ_self position).trans_le (le_max_right _ _)
-      exfalso
-      exact hnoReject position cutoff hposition hpositionCutoff
-        (hrejects.later_tail (le_max_left _ _))
-  let cutoff : ℕ → ℕ := fun position ↦
-    if hposition : start ≤ position then
-      Classical.choose (haccepted position hposition)
-    else 0
-  have hcutoff_accepts : ∀ position, start ≤ position →
-      PrefixAccepts barrier
-        (Fin.append stem (fun _ : Fin 1 ↦ diagonal position))
-        (fun n ↦ diagonal (cutoff position + n)) := by
-    intro position hposition
-    simp only [cutoff, hposition, dite_true]
-    exact (Classical.choose_spec (haccepted position hposition)).2
-  let positions : ℕ → ℕ := escapingSequence cutoff start
-  let selected : ℕ → ℕ := fun n ↦ diagonal (positions n)
-  have hpositions : StrictMono positions :=
-    escapingSequence_strictMono cutoff start
-  have hpositionsStart : ∀ n, start ≤ positions n :=
-    escapingSequence_start_le cutoff start
-  have hselectedAccepts : PrefixAccepts barrier stem selected := by
-    intro subsequence hsubsequence
-    let firstPosition : ℕ := positions (subsequence 0)
-    have hfirstPosition : start ≤ firstPosition :=
-      hpositionsStart (subsequence 0)
-    have haccepts := hcutoff_accepts firstPosition hfirstPosition
-    let factor : ℕ → ℕ := fun i ↦
-      positions (subsequence (i + 1)) - cutoff firstPosition
-    have hcutoff_le : ∀ i, cutoff firstPosition ≤
-        positions (subsequence (i + 1)) := by
-      intro i
-      have hbound : cutoff firstPosition ≤
-          positions (subsequence 0 + 1) := by
-        exact escapingSequence_bound_le_succ cutoff start (subsequence 0)
-      have hindices : subsequence 0 + 1 ≤ subsequence (i + 1) := by
-        exact Nat.succ_le_of_lt <| by
-          simpa only [Nat.succ_eq_add_one] using
-            hsubsequence (Nat.zero_lt_succ i)
-      exact hbound.trans (hpositions.monotone hindices)
-    have hfactor : StrictMono factor := by
-      intro i j hij
-      apply Nat.sub_lt_sub_right (hcutoff_le i)
-      apply hpositions
-      apply hsubsequence
-      omega
-    apply exists_barrier_extension_of_prefixAccepts_singleton
-      haccepts hfactor
-    · rfl
-    · intro i
-      dsimp only [factor, firstPosition, selected]
-      congr 1
-      exact Nat.add_sub_of_le (hcutoff_le i)
-  let tailFactor : ℕ → ℕ := fun n ↦ positions n - start
-  have htailFactor : StrictMono tailFactor :=
-    escapingSequence_sub_start_strictMono cutoff start
-  apply hrejects tailFactor htailFactor
-  have hfactorization := escapingSequence_factors_through_tail cutoff start
-  change PrefixAccepts barrier stem
-    ((fun n ↦ diagonal (start + n)) ∘ tailFactor)
-  rw [show (fun n ↦ diagonal (start + n)) ∘ tailFactor = selected by
-    funext n
-    simp only [Function.comp_apply, tailFactor, selected]
-    congr 1
-    exact (congrFun hfactorization n).symm]
-  exact hselectedAccepts
 
 /-- Strengthened rejected-extension theorem: beyond one boundary, every
 candidate position has a singleton extension rejected on some later tail.
@@ -1691,13 +1276,6 @@ def selectedSubstem {length : ℕ} (positions : Fin length → ℕ)
     (subset : Finset (Fin length)) : Fin subset.card → ℕ :=
   fun i ↦ positions (subset.orderEmbOfFin rfl i)
 
-/-- An increasing selected position stem has increasing order-preserving
-sub-stems. -/
-theorem selectedSubstem_strictMono
-    {length : ℕ} {positions : Fin length → ℕ}
-    (hpositions : StrictMono positions) (subset : Finset (Fin length)) :
-    StrictMono (selectedSubstem positions subset) :=
-  hpositions.comp (subset.orderEmbOfFin rfl).strictMono
 
 /-- Every subset of `Fin (length + 1)` is uniquely of one of the two forms
 needed by fusion: a lifted old subset, or a lifted old subset together with
@@ -1967,106 +1545,6 @@ def initialRejectedFusionState
   positions_lt_cutoff := fun i ↦ Fin.elim0 i
   rejects := hrejects
 
-/-- Coherence relation between successive negative-branch fusion states. The
-old position stem is preserved exactly, and the new last position lies beyond
-the old cutoff. -/
-def RejectedFusionState.Extends
-    {barrier : ∀ length : ℕ, (Fin length → ℕ) → Prop}
-    {diagonal : ℕ → ℕ} {length : ℕ}
-    (current : RejectedFusionState barrier diagonal length)
-    (next : RejectedFusionState barrier diagonal (length + 1)) : Prop :=
-  (∀ i : Fin length, next.positions i.castSucc = current.positions i) ∧
-    current.cutoff ≤ next.positions (Fin.last length)
-
-/-- The rejected-singleton-extension lemma advances any fusion state by one
-coherent selected position. -/
-theorem exists_nextRejectedFusionState
-    (barrier : ∀ length : ℕ, (Fin length → ℕ) → Prop)
-    (diagonal : ℕ → ℕ)
-    (hdecides : ∀ {length : ℕ} (stem : Fin length → ℕ),
-      ∃ k : ℕ,
-        PrefixAccepts barrier stem (fun n ↦ diagonal (k + n)) ∨
-          PrefixRejects barrier stem (fun n ↦ diagonal (k + n)))
-    {length : ℕ}
-    (current : RejectedFusionState barrier diagonal length) :
-    ∃ next : RejectedFusionState barrier diagonal (length + 1),
-      current.Extends next := by
-  classical
-  obtain ⟨position, nextCutoff, hposition, hpositionCutoff, hrejects⟩ :=
-    exists_rejected_singleton_extension barrier
-      (fun i ↦ diagonal (current.positions i)) diagonal hdecides
-      current.rejects
-  let nextPositions : Fin (length + 1) → ℕ :=
-    Fin.append current.positions (fun _ : Fin 1 ↦ position)
-  have hnextStrict : StrictMono nextPositions :=
-    strictMono_fin_append_singleton current.strictMono_positions
-      current.positions_lt_cutoff hposition
-  have hnextBefore : ∀ i, nextPositions i < nextCutoff := by
-    intro i
-    refine Fin.addCases (fun j ↦ ?_) (fun j ↦ ?_) i
-    · simp only [nextPositions, Fin.append_left]
-      exact ((current.positions_lt_cutoff j).trans_le hposition).trans
-        hpositionCutoff
-    · have hj : j = 0 := Fin.eq_zero j
-      subst j
-      simpa only [nextPositions, Fin.append_right] using hpositionCutoff
-  have hstem : (fun i ↦ diagonal (nextPositions i)) =
-      Fin.append (fun i ↦ diagonal (current.positions i))
-        (fun _ : Fin 1 ↦ diagonal position) := by
-    funext i
-    refine Fin.addCases (fun j ↦ ?_) (fun j ↦ ?_) i
-    · simp only [nextPositions, Fin.append_left]
-    · simp only [nextPositions, Fin.append_right]
-  let next : RejectedFusionState barrier diagonal (length + 1) :=
-    { positions := nextPositions
-      cutoff := nextCutoff
-      strictMono_positions := hnextStrict
-      positions_lt_cutoff := hnextBefore
-      rejects := by
-        rw [hstem]
-        exact hrejects }
-  refine ⟨next, ?_, ?_⟩
-  · intro i
-    change Fin.append current.positions (fun _ : Fin 1 ↦ position)
-      i.castSucc = current.positions i
-    have hi : i.castSucc = Fin.castAdd 1 i := Fin.ext rfl
-    rw [hi, Fin.append_left]
-  · simp only [next, nextPositions]
-    have hlast : Fin.last length =
-        Fin.natAdd length (0 : Fin 1) := Fin.ext <| by
-      simp only [Fin.val_last, Fin.val_natAdd, Fin.val_zero, Nat.add_zero]
-    rw [hlast, Fin.append_right]
-    exact hposition
-
-/-- Choose the canonical next fusion state supplied by the transition
-theorem. -/
-noncomputable def nextRejectedFusionState
-    (barrier : ∀ length : ℕ, (Fin length → ℕ) → Prop)
-    (diagonal : ℕ → ℕ)
-    (hdecides : ∀ {length : ℕ} (stem : Fin length → ℕ),
-      ∃ k : ℕ,
-        PrefixAccepts barrier stem (fun n ↦ diagonal (k + n)) ∨
-          PrefixRejects barrier stem (fun n ↦ diagonal (k + n)))
-    {length : ℕ}
-    (current : RejectedFusionState barrier diagonal length) :
-    RejectedFusionState barrier diagonal (length + 1) :=
-  Classical.choose
-    (exists_nextRejectedFusionState barrier diagonal hdecides current)
-
-/-- The chosen successor state coherently extends its predecessor. -/
-theorem nextRejectedFusionState_extends
-    (barrier : ∀ length : ℕ, (Fin length → ℕ) → Prop)
-    (diagonal : ℕ → ℕ)
-    (hdecides : ∀ {length : ℕ} (stem : Fin length → ℕ),
-      ∃ k : ℕ,
-        PrefixAccepts barrier stem (fun n ↦ diagonal (k + n)) ∨
-          PrefixRejects barrier stem (fun n ↦ diagonal (k + n)))
-    {length : ℕ}
-    (current : RejectedFusionState barrier diagonal length) :
-    current.Extends
-      (nextRejectedFusionState barrier diagonal hdecides current) :=
-  Classical.choose_spec
-    (exists_nextRejectedFusionState barrier diagonal hdecides current)
 
 /-- The corrected dependent invariant for the negative Galvin branch. Every
 order-preserving sub-stem of the selected positions, not merely the full
@@ -2839,14 +2317,6 @@ theorem bftPointwiseDichotomy_of_thresholdPairSubsequenceDichotomy
     exact pointwiseConvergence_of_rational_thresholdPairConvergence
       (fun n point ↦ hbounded (subsequence n) point) hconverges
 
-/-- The compact-metrizable BFT theorem follows from the fixed-threshold pair
-dichotomy, which is discharged by the Ramsey theorem below. -/
-theorem compactMetrizableBFT_of_thresholdPairSubsequenceDichotomy
-    (hDichotomy : ThresholdPairSubsequenceDichotomy.{u}) :
-    CompactMetrizableBFT.{u} := by
-  intro α _ _ _
-  exact bftPointwiseDichotomy_of_thresholdPairSubsequenceDichotomy
-    hDichotomy α
 
 /-- The closed-set Galvin--Prikry theorem, now discharged from Galvin's proved
 open-prefix lemma. -/
@@ -2870,104 +2340,6 @@ theorem bftPointwiseDichotomy
   bftPointwiseDichotomy_of_thresholdPairSubsequenceDichotomy
     thresholdPairSubsequenceDichotomy α
 
-/-- The compact-metrizable BFT theorem, with the Galvin--Prikry foundation
-fully internalized. -/
-theorem compactMetrizableBFT : CompactMetrizableBFT.{u} :=
-  compactMetrizableBFT_of_thresholdPairSubsequenceDichotomy
-    thresholdPairSubsequenceDichotomy
-
-/-- Every bounded sequence admits a subsequence converging pointwise on any
-prescribed countable subset. -/
-theorem exists_subsequence_convergesPointwiseOn_of_countable
-    {α : Type*} {values : ℕ → α → ℝ} {subset : Set α}
-    (hsubset : subset.Countable)
-    (hbounded : ∀ n point, values n point ∈ Set.Icc (0 : ℝ) 1) :
-    ∃ subsequence : ℕ → ℕ, StrictMono subsequence ∧
-      ConvergesPointwiseOn
-        (fun n point ↦ values (subsequence n) point) subset := by
-  letI : Countable subset := hsubset.to_subtype
-  have hrestricted := hasPointwiseConvergentSubsequence_of_countable
-    (values := fun (n : ℕ) (point : subset) ↦ values n point.1)
-    (fun n point ↦ hbounded n point.1)
-  obtain ⟨subsequence, hsubsequence, hconverges⟩ := hrestricted
-  refine ⟨subsequence, hsubsequence, ?_⟩
-  intro point hpoint
-  exact hconverges ⟨point, hpoint⟩
-
-/-- On a separable space the preceding diagonal argument may be carried out
-on one countable dense subset. -/
-theorem exists_countable_dense_subsequence_convergesPointwiseOn
-    {α : Type*} [TopologicalSpace α] [SeparableSpace α]
-    {values : ℕ → α → ℝ}
-    (hbounded : ∀ n point, values n point ∈ Set.Icc (0 : ℝ) 1) :
-    ∃ subset : Set α, subset.Countable ∧ Dense subset ∧
-      ∃ subsequence : ℕ → ℕ, StrictMono subsequence ∧
-        ConvergesPointwiseOn
-          (fun n point ↦ values (subsequence n) point) subset := by
-  obtain ⟨subset, hcountable, hdense⟩ := exists_countable_dense α
-  obtain ⟨subsequence, hsubsequence, hconverges⟩ :=
-    exists_subsequence_convergesPointwiseOn_of_countable
-      hcountable hbounded
-  exact ⟨subset, hcountable, hdense, subsequence, hsubsequence, hconverges⟩
-
-/-- The irreducible dense-extension core of the BFT theorem. After a bounded
-continuous sequence with no independent subsequence has been made pointwise
-convergent on a dense set, it has a further pointwise convergent subsequence
-on the whole space. -/
-def BFTDenseExtension (α : Type*) [TopologicalSpace α] : Prop :=
-  ∀ values : ℕ → α → ℝ,
-    (∀ n, Continuous (values n)) →
-    (∀ n point, values n point ∈ Set.Icc (0 : ℝ) 1) →
-    (¬ HasIndependentSubsequence values) →
-    ∀ subset : Set α, Dense subset → ConvergesPointwiseOn values subset →
-      HasPointwiseConvergentSubsequence values
-
-/-- On a separable space, the dense-extension principle implies the full BFT
-pointwise dichotomy: first diagonalize on a countable dense set, then apply
-the principle to the selected subsequence. -/
-theorem bftPointwiseDichotomy_of_denseExtension
-    (α : Type*) [TopologicalSpace α] [SeparableSpace α]
-    (hDenseExtension : BFTDenseExtension α) :
-    BFTPointwiseDichotomy α := by
-  intro values hcontinuous hbounded
-  by_cases hIndependent : HasIndependentSubsequence values
-  · exact Or.inr hIndependent
-  · left
-    obtain ⟨subset, _hcountable, hdense,
-        subsequence, hsubsequence, hconvergesDense⟩ :=
-      exists_countable_dense_subsequence_convergesPointwiseOn hbounded
-    let selected : ℕ → α → ℝ :=
-      fun n point ↦ values (subsequence n) point
-    have hselectedContinuous : ∀ n, Continuous (selected n) :=
-      fun n ↦ hcontinuous (subsequence n)
-    have hselectedBounded : ∀ n point,
-        selected n point ∈ Set.Icc (0 : ℝ) 1 :=
-      fun n point ↦ hbounded (subsequence n) point
-    have hselectedNoIndependent : ¬ HasIndependentSubsequence selected :=
-      not_hasIndependentSubsequence_comp
-        hIndependent subsequence hsubsequence
-    obtain ⟨further, hfurther, hconverges⟩ :=
-      hDenseExtension selected hselectedContinuous hselectedBounded
-        hselectedNoIndependent subset hdense hconvergesDense
-    refine ⟨subsequence ∘ further, hsubsequence.comp hfurther, ?_⟩
-    simpa [selected, Function.comp_def] using hconverges
-
-/-- An alternative interface for BFT uses the dense-extension principle on
-compact metrizable spaces. The unconditional proof above does not require
-this interface as an additional premise. -/
-def CompactMetrizableBFTDenseExtension.{κ} : Prop :=
-  ∀ (α : Type κ) [TopologicalSpace α] [CompactSpace α]
-    [MetrizableSpace α], BFTDenseExtension α
-
-/-- The compact-metrizable dense-extension theorem implies the previously
-isolated compact-metrizable BFT dichotomy. -/
-theorem compactMetrizableBFT_of_denseExtension
-    (hDenseExtension : CompactMetrizableBFTDenseExtension.{u}) :
-    CompactMetrizableBFT.{u} := by
-  intro α _ _ _
-  letI : SeparableSpace α :=
-    isSeparable_univ_iff.mp isCompact_univ.isSeparable
-  exact bftPointwiseDichotomy_of_denseExtension α (hDenseExtension α)
 
 /-- Every row sequence has a subsequence whose evaluation functions converge
 pointwise on the concrete local parameter type space. -/
@@ -3102,71 +2474,6 @@ theorem isNIPOnStructure_iff_pointwiseConvergentSubsequenceOnLocalType_general
   isNIPOnStructure_iff_pointwiseConvergentSubsequenceOnLocalType_of_bft
     (bftPointwiseDichotomy _)
 
-/-- For separable row sorts with a common Lipschitz modulus, the local type
-space is compact metrizable. This compatibility wrapper accepts the general
-compact-metrizable BFT theorem explicitly; the next wrapper supplies it
-internally. -/
-theorem hasPointwiseConvergentSubsequenceOnLocalType_of_compactMetrizableBFT
-    {Symbol : Type w} {M : MultiStructure.{u, v, w} Symbol}
-    {φ : MultiFormula Symbol 1 1} {K : NNReal}
-    [SeparableSpace M.Row]
-    (hLipschitz : ParameterProfilesLipschitzWith M φ K)
-    (hBFT : CompactMetrizableBFT.{u})
-    (hNIP : IsNIPOnStructure M φ) :
-    HasPointwiseConvergentSubsequenceOnLocalType M φ := by
-  letI : MetrizableSpace (LocalParameterType M φ) :=
-    localParameterTypeMetrizableSpace M φ K hLipschitz
-  exact
-    hasPointwiseConvergentSubsequenceOnLocalType_of_bftPointwiseDichotomy
-      (hBFT (LocalParameterType M φ)) hNIP
-
-/-- On a separable row sort with the common Lipschitz bound, structure-level
-NIP unconditionally yields pointwise sequential compactness on the local type
-space. The compact-metrizable BFT theorem is now supplied internally. -/
-theorem hasPointwiseConvergentSubsequenceOnLocalType_of_isNIPOnStructure
-    {Symbol : Type w} {M : MultiStructure.{u, v, w} Symbol}
-    {φ : MultiFormula Symbol 1 1} {K : NNReal}
-    [SeparableSpace M.Row]
-    (hLipschitz : ParameterProfilesLipschitzWith M φ K)
-    (hNIP : IsNIPOnStructure M φ) :
-    HasPointwiseConvergentSubsequenceOnLocalType M φ :=
-  hasPointwiseConvergentSubsequenceOnLocalType_of_compactMetrizableBFT
-    hLipschitz compactMetrizableBFT hNIP
-
-/-- The unconditional local-type BFT characterization for separable row
-sorts with a common Lipschitz modulus. -/
-theorem isNIPOnStructure_iff_pointwiseConvergentSubsequenceOnLocalType
-    {Symbol : Type w} {M : MultiStructure.{u, v, w} Symbol}
-    {φ : MultiFormula Symbol 1 1} {K : NNReal}
-    [SeparableSpace M.Row]
-    (hLipschitz : ParameterProfilesLipschitzWith M φ K) :
-    IsNIPOnStructure M φ ↔
-      HasPointwiseConvergentSubsequenceOnLocalType M φ :=
-  ⟨hasPointwiseConvergentSubsequenceOnLocalType_of_isNIPOnStructure
-      hLipschitz,
-    isNIPOnStructure_of_pointwiseConvergentSubsequenceOnLocalType⟩
-
-/-- Complete-theory NIP implies NIP on the distinguished structure. -/
-theorem IsNIPInCompleteTheory.isNIPOnStructure
-    {Symbol : Type w} {M : MultiStructure.{u, v, w} Symbol}
-    {φ : MultiFormula Symbol 1 1}
-    (hNIP : IsNIPInCompleteTheory M φ) :
-    IsNIPOnStructure M φ := by
-  rintro ⟨low, high, hgap, hIP⟩
-  apply hNIP
-  exact ⟨M, MultiSameCompleteTheory.refl M, low, high, hgap, hIP⟩
-
-/-- Complete-theory NIP therefore supplies the unconditional local-type
-pointwise-subsequence property under the separable Lipschitz hypotheses. -/
-theorem IsNIPInCompleteTheory.hasPointwiseConvergentSubsequenceOnLocalType
-    {Symbol : Type w} {M : MultiStructure.{u, v, w} Symbol}
-    {φ : MultiFormula Symbol 1 1} {K : NNReal}
-    [SeparableSpace M.Row]
-    (hNIP : IsNIPInCompleteTheory M φ)
-    (hLipschitz : ParameterProfilesLipschitzWith M φ K) :
-    HasPointwiseConvergentSubsequenceOnLocalType M φ :=
-  hasPointwiseConvergentSubsequenceOnLocalType_of_isNIPOnStructure
-    hLipschitz hNIP.isNIPOnStructure
 
 end MultiFormula
 

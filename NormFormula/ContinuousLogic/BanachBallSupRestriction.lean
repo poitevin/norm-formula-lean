@@ -32,13 +32,6 @@ def limitBallAssignmentPoint [Encodable Symbol]
     BallTerm.Assignment initial.limitRationalBallSystem context :=
   fun i ↦ initial.limitPoint (context i) (indices i)
 
-@[simp]
-theorem limitBallInclusion_limitPoint [Encodable Symbol]
-    (initial : BallWitnessIndexing M) (radius : ℚ≥0)
-    (index : initial.LimitIndex radius) :
-    initial.limitBallInclusion radius (initial.limitPoint radius index) =
-      initial.limitMap radius index :=
-  rfl
 
 /-- Canonical limit assignments are dense in each finite dependent closed
 assignment space. -/
@@ -62,32 +55,6 @@ theorem continuous_includeLimitBallAssignment [Encodable Symbol]
   intro i
   exact continuous_subtype_val.comp (continuous_apply i)
 
-@[simp]
-theorem include_limitBallAssignmentPoint [Encodable Symbol]
-    (initial : BallWitnessIndexing M)
-    {n : ℕ} {context : BallContext n}
-    (indices : ∀ i : Fin n, initial.LimitIndex (context i)) :
-    initial.includeLimitBallAssignment
-        (initial.limitBallAssignmentPoint indices) =
-      initial.ambientLimitAssignment indices := by
-  funext i
-  rfl
-
-@[simp]
-theorem includeLimitBallAssignment_cons [Encodable Symbol]
-    (initial : BallWitnessIndexing M)
-    {n : ℕ} {context : BallContext n} (radius : ℚ≥0)
-    (x : initial.LimitCarrier radius)
-    (assignment : BallTerm.Assignment
-      initial.limitRationalBallSystem context) :
-    initial.includeLimitBallAssignment (context := Fin.cons radius context)
-        (Fin.cons x assignment) =
-      (Fin.cons (initial.limitBallInclusion radius x)
-        (initial.includeLimitBallAssignment assignment) :
-          BallTerm.Assignment M.toRationalBallSystem
-            (Fin.cons radius context)) := by
-  funext i
-  refine Fin.cases ?_ (fun j ↦ ?_) i <;> rfl
 
 /-- A rational ball supremum is preserved by the closed limit structure once
 its child formula is preserved. -/

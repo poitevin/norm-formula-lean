@@ -104,10 +104,6 @@ theorem norm_ofBounded_le (x : lp (fun _ : ι ↦ E) ∞) {C : ℝ}
     (hx : ∀ᶠ i in U, ‖x i‖ ≤ C) : ‖ofBounded U x‖ ≤ C :=
   le_of_tendsto (tendsto_norm_ofBounded U x) hx
 
-theorem norm_ofBounded_eq (x : lp (fun _ : ι ↦ E) ∞) {C : ℝ}
-    (hx : ∀ᶠ i in U, ‖x i‖ = C) : ‖ofBounded U x‖ = C :=
-  tendsto_nhds_unique (tendsto_norm_ofBounded U x)
-    (tendsto_const_nhds.congr' (hx.mono fun _ hi ↦ hi.symm))
 
 /-- A uniformly bounded family, as an element of `ℓ∞`. -/
 def boundedFamily (f : ι → E) (C : ℝ) (hf : ∀ i, ‖f i‖ ≤ C) :

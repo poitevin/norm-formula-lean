@@ -41,65 +41,6 @@ def limitBallInclusion [Encodable Symbol]
     (initial.limitBallStructure).Ball radius → M.Ball radius :=
   Subtype.val
 
-theorem limitBallInclusion_uniformContinuous [Encodable Symbol]
-    (initial : BallWitnessIndexing M) (radius : ℚ≥0) :
-    UniformContinuous (initial.limitBallInclusion radius) :=
-  uniformContinuous_subtype_val
-
-@[simp]
-theorem limitBallStructure_predicate [Encodable Symbol]
-    (initial : BallWitnessIndexing M) (symbol : Symbol)
-    (point : (initial.limitBallStructure).Ball (symbolRadius symbol)) :
-    (initial.limitBallStructure).predicate symbol point =
-      M.predicate symbol (initial.limitBallInclusion _ point) :=
-  rfl
-
-@[simp]
-theorem limitBallStructure_inclusion [Encodable Symbol]
-    (initial : BallWitnessIndexing M) {r s : ℚ≥0} (h : r ≤ s)
-    (point : (initial.limitBallStructure).Ball r) :
-    initial.limitBallInclusion s
-        ((initial.limitBallStructure).inclusion h point) =
-      M.inclusion h (initial.limitBallInclusion r point) :=
-  rfl
-
-@[simp]
-theorem limitBallStructure_zero [Encodable Symbol]
-    (initial : BallWitnessIndexing M) (radius : ℚ≥0) :
-    initial.limitBallInclusion radius
-        ((initial.limitBallStructure).zero radius) =
-      M.zero radius :=
-  rfl
-
-@[simp]
-theorem limitBallStructure_neg [Encodable Symbol]
-    (initial : BallWitnessIndexing M) (radius : ℚ≥0)
-    (point : (initial.limitBallStructure).Ball radius) :
-    initial.limitBallInclusion radius
-        ((initial.limitBallStructure).neg radius point) =
-      M.neg radius (initial.limitBallInclusion radius point) :=
-  rfl
-
-@[simp]
-theorem limitBallStructure_add [Encodable Symbol]
-    (initial : BallWitnessIndexing M) (r s : ℚ≥0)
-    (pair : (initial.limitBallStructure).Ball r ×
-      (initial.limitBallStructure).Ball s) :
-    initial.limitBallInclusion (r + s)
-        ((initial.limitBallStructure).add r s pair) =
-      M.add r s
-        (initial.limitBallInclusion r pair.1,
-          initial.limitBallInclusion s pair.2) :=
-  rfl
-
-@[simp]
-theorem limitBallStructure_smul [Encodable Symbol]
-    (initial : BallWitnessIndexing M) (q : ℚ) (radius : ℚ≥0)
-    (point : (initial.limitBallStructure).Ball radius) :
-    initial.limitBallInclusion (q.nnabs * radius)
-        ((initial.limitBallStructure).smul q radius point) =
-      M.smul q radius (initial.limitBallInclusion radius point) :=
-  rfl
 
 end BallWitnessIndexing
 

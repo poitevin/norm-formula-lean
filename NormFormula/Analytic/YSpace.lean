@@ -35,8 +35,6 @@ noncomputable instance : Module ℝ Y := equivHilbert.module ℝ
 noncomputable instance : Norm Y where
   norm y := yNorm y.toHilbert
 
-@[simp]
-theorem norm_def (y : Y) : ‖y‖ = yNorm y.toHilbert := rfl
 
 @[ext]
 theorem ext {x y : Y} (h : x.toHilbert = y.toHilbert) : x = y := by
@@ -44,17 +42,6 @@ theorem ext {x y : Y} (h : x.toHilbert = y.toHilbert) : x = y := by
   cases y
   simp_all
 
-@[simp]
-theorem toHilbert_zero : (0 : Y).toHilbert = 0 := rfl
-
-@[simp]
-theorem toHilbert_add (x y : Y) : (x + y).toHilbert = x.toHilbert + y.toHilbert := rfl
-
-@[simp]
-theorem toHilbert_neg (x : Y) : (-x).toHilbert = -x.toHilbert := rfl
-
-@[simp]
-theorem toHilbert_smul (r : ℝ) (x : Y) : (r • x).toHilbert = r • x.toHilbert := rfl
 
 /-- The minimal norm axioms, inherited from the augmented seminorm construction. -/
 private noncomputable def normedSpaceCore : NormedSpace.Core ℝ Y where
@@ -86,12 +73,6 @@ def linearEquivHilbert : Y ≃ₗ[ℝ] HilbertSpace where
   map_add' _ _ := rfl
   map_smul' _ _ := rfl
 
-@[simp]
-theorem linearEquivHilbert_apply (y : Y) : linearEquivHilbert y = y.toHilbert := rfl
-
-@[simp]
-theorem linearEquivHilbert_symm_apply (z : HilbertSpace) :
-    linearEquivHilbert.symm z = ⟨z⟩ := rfl
 
 /-- One side of the equivalence of the `Y`-norm and Hilbert norm. -/
 theorem hilbert_norm_le_norm (y : Y) : ‖y.toHilbert‖ ≤ ‖y‖ :=

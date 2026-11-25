@@ -35,12 +35,6 @@ theorem normFormula_isIPInCompleteTheory
     (Real.sqrt 2) (Real.sqrt 2) (Real.sqrt 3) (Real.sqrt 6)
     X.sqrtThree_lt_sqrtSix normTranslate_hasIPPatternsInEveryDimension
 
-/-- The formula token in the preceding theorem interprets as the actual norm
-translation predicate on the distinguished direct sum. -/
-theorem normFormula_value_eq_normTranslate
-    (P : CompleteTheoryIPPresentation S) :
-    S.formulaValue P.normFormula = normTranslate :=
-  P.normFormula_value
 
 end CompleteTheoryIPPresentation
 

@@ -57,12 +57,6 @@ def rescaledDistanceAt (A : XBallTheoryModel.{u})
     (dist (A.model.inclusion hx x.2) (A.model.inclusion hy y.2) /
       A.model.sortBound target)
 
-theorem rescaledDistanceAt_nonneg (A : XBallTheoryModel.{u})
-    (x y : A.DirectedPoint) (target : ℚ≥0)
-    (hx : x.1 ≤ target) (hy : y.1 ≤ target) :
-    0 ≤ A.rescaledDistanceAt x y target hx hy := by
-  exact mul_nonneg (rationalBallMetricBound_pos target).le
-    (div_nonneg dist_nonneg (A.model.sortBound_pos target).le)
 
 theorem rescaledDistanceAt_self (A : XBallTheoryModel.{u})
     (x : A.DirectedPoint) (target : ℚ≥0) (hx : x.1 ≤ target) :
@@ -131,9 +125,6 @@ def directedDistance (A : XBallTheoryModel.{u})
   A.rescaledDistanceAt x y (A.commonRadius x y)
     (A.left_le_commonRadius x y) (A.right_le_commonRadius x y)
 
-theorem directedDistance_nonneg (A : XBallTheoryModel.{u})
-    (x y : A.DirectedPoint) : 0 ≤ A.directedDistance x y :=
-  A.rescaledDistanceAt_nonneg x y _ _ _
 
 theorem directedDistance_self (A : XBallTheoryModel.{u})
     (x : A.DirectedPoint) : A.directedDistance x x = 0 :=
@@ -346,15 +337,6 @@ theorem directedHilbertValue_nonneg
   exact mul_nonneg (rationalBallMetricBound_pos radius).le
     (A.model.predicate (.hilbert radius) x).2.1
 
-/-- Enlarging a radius tag does not change the unnormalized auxiliary
-Hilbert value. -/
-theorem directedHilbertValue_inclusion
-    (A : XBallTheoryModel.{u}) {r s : ℚ≥0} (h : r ≤ s)
-    (x : A.model.Ball r) :
-    A.directedHilbertValue ⟨s, A.model.inclusion h x⟩ =
-      A.directedHilbertValue ⟨r, x⟩ := by
-  exact inclusion_preserves_rescaledHilbertNorm_of_sameCompleteTheory
-    A.model A.sameCompleteTheory h x
 
 /-- Zero canonical directed pseudodistance forces equality of the auxiliary
 Hilbert values. -/
@@ -564,16 +546,6 @@ theorem directedDistance_neg_eq_zero_of_eq_zero
   rw [hdist]
   simp
 
-/-- Double raw negation has zero directed distance from the original tagged
-point, by transfer of the universal involutive-negation sentence. -/
-theorem directedDistance_neg_neg_eq_zero
-    (A : XBallTheoryModel.{u}) (x : A.DirectedPoint) :
-    A.directedDistance (A.directedNeg (A.directedNeg x)) x = 0 := by
-  rcases x with ⟨r, x⟩
-  exact A.directedDistance_sameRadius_eq_zero r
-    (A.model.neg r (A.model.neg r x)) x
-    (dist_neg_neg_eq_zero_of_sameCompleteTheory
-      A.model A.sameCompleteTheory r x)
 
 /-- Add two radius-tagged points; the output carries the sum radius. -/
 def directedAdd (A : XBallTheoryModel.{u}) :
@@ -837,20 +809,6 @@ def separatedSmul (A : XBallTheoryModel.{u}) (q : ℚ) :
       A.toSeparatedDirectedPoint (A.directedNeg x) :=
   rfl
 
-/-- Negation is literally involutive after metric separation. -/
-@[simp] theorem separatedNeg_neg (A : XBallTheoryModel.{u})
-    (x : A.SeparatedDirectedPoint) :
-    A.separatedNeg (A.separatedNeg x) = x := by
-  refine Quotient.inductionOn' x ?_
-  intro representative
-  change A.separatedNeg
-      (A.separatedNeg (A.toSeparatedDirectedPoint representative)) =
-    A.toSeparatedDirectedPoint representative
-  rw [A.separatedNeg_toSeparatedDirectedPoint,
-    A.separatedNeg_toSeparatedDirectedPoint]
-  rw [A.toSeparatedDirectedPoint_eq_iff]
-  exact A.directedDistance_neg_neg_eq_zero representative
-
 /-- The zero named in any radius sort maps to the separated zero. -/
 theorem toSeparatedDirectedPoint_zero (A : XBallTheoryModel.{u})
     (r : ℚ≥0) :
@@ -977,38 +935,6 @@ theorem dist_separatedAdd_right (A : XBallTheoryModel.{u})
   exact A.dist_separatedAdd_right_sameRadius target s
     (A.model.inclusion hx x) (A.model.inclusion hy y) z
 
-/-- Addition by a fixed element on the right is an isometry. -/
-theorem separatedAdd_right_isometry (A : XBallTheoryModel.{u})
-    (z : A.SeparatedDirectedPoint) :
-    Isometry (fun x ↦ A.separatedAdd x z) :=
-  Isometry.of_dist_eq fun x y ↦ A.dist_separatedAdd_right x y z
-
-theorem separatedAdd_right_uniformContinuous (A : XBallTheoryModel.{u})
-    (z : A.SeparatedDirectedPoint) :
-    UniformContinuous (fun x ↦ A.separatedAdd x z) :=
-  (A.separatedAdd_right_isometry z).uniformContinuous
-
-/-- The separated zero is a right identity for descended addition. -/
-theorem separatedAdd_zero (A : XBallTheoryModel.{u})
-    (x : A.SeparatedDirectedPoint) :
-    A.separatedAdd x A.separatedZero = x := by
-  refine Quotient.inductionOn' x ?_
-  rintro ⟨r, x⟩
-  change A.separatedAdd (A.toSeparatedDirectedPoint ⟨r, x⟩)
-      A.separatedZero = A.toSeparatedDirectedPoint ⟨r, x⟩
-  rw [← A.toSeparatedDirectedPoint_zero r]
-  rw [A.separatedAdd_toSeparatedDirectedPoint]
-  let h : r ≤ r + r := le_add_of_nonneg_right (zero_le r)
-  calc
-    A.toSeparatedDirectedPoint
-        (A.directedAdd ⟨r, x⟩ ⟨r, A.model.zero r⟩) =
-      A.toSeparatedDirectedPoint ⟨r + r, A.model.inclusion h x⟩ := by
-        rw [A.toSeparatedDirectedPoint_eq_iff]
-        apply A.directedDistance_sameRadius_eq_zero
-        exact dist_add_zero_eq_zero_of_sameCompleteTheory
-          A.model A.sameCompleteTheory r x
-    _ = A.toSeparatedDirectedPoint ⟨r, x⟩ :=
-      A.toSeparatedDirectedPoint_inclusion h x
 
 /-- The separated zero is a left identity for descended addition. -/
 theorem separatedZero_add (A : XBallTheoryModel.{u})
@@ -1033,26 +959,6 @@ theorem separatedZero_add (A : XBallTheoryModel.{u})
     _ = A.toSeparatedDirectedPoint ⟨r, x⟩ :=
       A.toSeparatedDirectedPoint_inclusion h x
 
-/-- Every separated element added to its negation is the separated zero. -/
-theorem separatedAdd_neg (A : XBallTheoryModel.{u})
-    (x : A.SeparatedDirectedPoint) :
-    A.separatedAdd x (A.separatedNeg x) = A.separatedZero := by
-  refine Quotient.inductionOn' x ?_
-  rintro ⟨r, x⟩
-  change A.separatedAdd (A.toSeparatedDirectedPoint ⟨r, x⟩)
-      (A.separatedNeg (A.toSeparatedDirectedPoint ⟨r, x⟩)) =
-    A.separatedZero
-  rw [A.separatedNeg_toSeparatedDirectedPoint,
-    A.separatedAdd_toSeparatedDirectedPoint]
-  calc
-    A.toSeparatedDirectedPoint
-        (A.directedAdd ⟨r, x⟩ (A.directedNeg ⟨r, x⟩)) =
-      A.toSeparatedDirectedPoint ⟨r + r, A.model.zero (r + r)⟩ := by
-        rw [A.toSeparatedDirectedPoint_eq_iff]
-        apply A.directedDistance_sameRadius_eq_zero
-        exact dist_add_neg_eq_zero_of_sameCompleteTheory
-          A.model A.sameCompleteTheory r x
-    _ = A.separatedZero := A.toSeparatedDirectedPoint_zero (r + r)
 
 /-- The negation of every separated element added to it is the separated
 zero. -/
@@ -1634,10 +1540,6 @@ theorem denseRange_toCompletedDirectedPoint (A : XBallTheoryModel.{u}) :
     DenseRange A.toCompletedDirectedPoint :=
   UniformSpace.Completion.denseRange_coe
 
-/-- The reconstructed completed carrier is complete. -/
-theorem completedDirectedPoint_completeSpace (A : XBallTheoryModel.{u}) :
-    CompleteSpace A.CompletedDirectedPoint :=
-  inferInstance
 
 /-- Sortwise separability of the typed ball model implies separability of
 the metric-separated directed union.  A countable dense family is obtained
@@ -1750,10 +1652,6 @@ canonical image. -/
       A.toCompletedDirectedPoint (A.separatedNeg x) := by
   exact UniformSpace.Completion.map_coe A.separatedNeg_uniformContinuous x
 
-/-- Completed negation remains uniformly continuous. -/
-theorem completedNeg_uniformContinuous (A : XBallTheoryModel.{u}) :
-    UniformContinuous A.completedNeg :=
-  UniformSpace.Completion.uniformContinuous_map
 
 /-- Addition extended jointly and uniformly continuously to the completed
 reconstruction. -/
@@ -1779,10 +1677,6 @@ canonical image. -/
   exact UniformSpace.Completion.map₂_coe_coe
     x y A.separatedAdd A.separatedAdd_uniformContinuous₂
 
-/-- Completed addition remains jointly uniformly continuous. -/
-theorem completedAdd_uniformContinuous₂ (A : XBallTheoryModel.{u}) :
-    UniformContinuous₂ A.completedAdd :=
-  UniformSpace.Completion.uniformContinuous_map₂ A.separatedAdd
 
 /-- Multiplication by a fixed rational scalar, extended to the completed
 reconstruction. -/
@@ -2373,26 +2267,6 @@ theorem auxiliaryPolarization_self_nonneg
   rw [A.auxiliaryPolarization_self, sq_eq_zero_iff,
     A.norm_auxiliaryHilbertCarrier_eq_zero_iff]
 
-/-- Polarization changes sign when its first argument is negated. -/
-theorem auxiliaryPolarization_neg_left
-    (A : XBallTheoryModel.{u})
-    (x y : A.AuxiliaryHilbertCarrier) :
-    A.auxiliaryPolarization (-x) y = -A.auxiliaryPolarization x y := by
-  unfold auxiliaryPolarization
-  rw [show -x + y = -(x - y) by abel,
-    show -x - y = -(x + y) by abel,
-    A.norm_auxiliaryHilbertCarrier_neg,
-    A.norm_auxiliaryHilbertCarrier_neg]
-  ring
-
-/-- Polarization changes sign when its second argument is negated. -/
-theorem auxiliaryPolarization_neg_right
-    (A : XBallTheoryModel.{u})
-    (x y : A.AuxiliaryHilbertCarrier) :
-    A.auxiliaryPolarization x (-y) = -A.auxiliaryPolarization x y := by
-  rw [A.auxiliaryPolarization_comm,
-    A.auxiliaryPolarization_neg_left,
-    A.auxiliaryPolarization_comm]
 
 /-- The Jordan--von Neumann four-parallelogram calculation: polarization is
 additive in its first argument. -/
@@ -2424,21 +2298,6 @@ theorem auxiliaryPolarization_add_right
     A.auxiliaryPolarization_comm y x,
     A.auxiliaryPolarization_comm z x]
 
-theorem auxiliaryPolarization_sub_left
-    (A : XBallTheoryModel.{u})
-    (x y z : A.AuxiliaryHilbertCarrier) :
-    A.auxiliaryPolarization (x - y) z =
-      A.auxiliaryPolarization x z - A.auxiliaryPolarization y z := by
-  rw [sub_eq_add_neg, A.auxiliaryPolarization_add_left,
-    A.auxiliaryPolarization_neg_left, sub_eq_add_neg]
-
-theorem auxiliaryPolarization_sub_right
-    (A : XBallTheoryModel.{u})
-    (x y z : A.AuxiliaryHilbertCarrier) :
-    A.auxiliaryPolarization x (y - z) =
-      A.auxiliaryPolarization x y - A.auxiliaryPolarization x z := by
-  rw [sub_eq_add_neg, A.auxiliaryPolarization_add_right,
-    A.auxiliaryPolarization_neg_right, sub_eq_add_neg]
 
 /-- Polarization against a fixed second argument as an additive homomorphism. -/
 noncomputable def auxiliaryPolarizationAddHomLeft
@@ -2454,19 +2313,6 @@ noncomputable def auxiliaryPolarizationAddHomLeft
       A.auxiliaryPolarization x y :=
   rfl
 
-/-- Polarization against a fixed first argument as an additive homomorphism. -/
-noncomputable def auxiliaryPolarizationAddHomRight
-    (A : XBallTheoryModel.{u}) (x : A.AuxiliaryHilbertCarrier) :
-    A.AuxiliaryHilbertCarrier →+ ℝ where
-  toFun y := A.auxiliaryPolarization x y
-  map_zero' := A.auxiliaryPolarization_zero_right x
-  map_add' y z := A.auxiliaryPolarization_add_right x y z
-
-@[simp] theorem auxiliaryPolarizationAddHomRight_apply
-    (A : XBallTheoryModel.{u}) (x y : A.AuxiliaryHilbertCarrier) :
-    A.auxiliaryPolarizationAddHomRight x y =
-      A.auxiliaryPolarization x y :=
-  rfl
 
 /-- Every additive map between rational vector spaces is rational-linear;
 applied to polarization this gives scalar homogeneity on the dense rational
@@ -2480,14 +2326,6 @@ theorem auxiliaryPolarization_rat_smul_left
     map_ratCast_smul (A.auxiliaryPolarizationAddHomLeft y)
       ℝ ℝ q x
 
-theorem auxiliaryPolarization_rat_smul_right
-    (A : XBallTheoryModel.{u}) (q : ℚ)
-    (x y : A.AuxiliaryHilbertCarrier) :
-    A.auxiliaryPolarization x ((q : ℝ) • y) =
-      (q : ℝ) * A.auxiliaryPolarization x y := by
-  rw [A.auxiliaryPolarization_comm,
-    A.auxiliaryPolarization_rat_smul_left,
-    A.auxiliaryPolarization_comm]
 
 /-- Polarization expressed entirely on the original completed Banach carrier.
 This is the bridge used to inherit continuity before the auxiliary triangle
@@ -2562,30 +2400,6 @@ theorem auxiliaryPolarization_smul_left
   intro q
   exact A.auxiliaryPolarization_rat_smul_left q x y
 
-theorem auxiliaryPolarization_smul_right
-    (A : XBallTheoryModel.{u}) (r : ℝ)
-    (x y : A.AuxiliaryHilbertCarrier) :
-    A.auxiliaryPolarization x (r • y) =
-      r * A.auxiliaryPolarization x y := by
-  rw [A.auxiliaryPolarization_comm,
-    A.auxiliaryPolarization_smul_left,
-    A.auxiliaryPolarization_comm]
-
-/-- Polarization against a fixed vector is now a genuine real-linear map. -/
-noncomputable def auxiliaryPolarizationLinearMapLeft
-    (A : XBallTheoryModel.{u}) (y : A.AuxiliaryHilbertCarrier) :
-    A.AuxiliaryHilbertCarrier →ₗ[ℝ] ℝ where
-  toFun x := A.auxiliaryPolarization x y
-  map_add' x z := A.auxiliaryPolarization_add_left x z y
-  map_smul' r x := by
-    simpa [smul_eq_mul] using
-      A.auxiliaryPolarization_smul_left r x y
-
-@[simp] theorem auxiliaryPolarizationLinearMapLeft_apply
-    (A : XBallTheoryModel.{u}) (x y : A.AuxiliaryHilbertCarrier) :
-    A.auxiliaryPolarizationLinearMapLeft y x =
-      A.auxiliaryPolarization x y :=
-  rfl
 
 /-- The reconstructed polarization satisfies exactly the algebraic and
 positivity axioms from which Mathlib derives an inner-product norm and its
@@ -2605,14 +2419,6 @@ noncomputable def auxiliaryInnerProductCore
   definite x hx :=
     (A.auxiliaryPolarization_self_eq_zero_iff x).1 hx
 
-/-- The norm generated abstractly by the inner-product core is exactly the
-already installed auxiliary norm operation. -/
-theorem sqrt_auxiliaryPolarization_self
-    (A : XBallTheoryModel.{u})
-    (x : A.AuxiliaryHilbertCarrier) :
-    Real.sqrt (A.auxiliaryPolarization x x) = ‖x‖ := by
-  rw [A.auxiliaryPolarization_self,
-    Real.sqrt_sq (A.norm_auxiliaryHilbertCarrier_nonneg x)]
 
 /-- Cauchy--Schwarz for the reconstructed polarization, expressed using the
 existing auxiliary norm operation. -/

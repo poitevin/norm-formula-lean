@@ -175,10 +175,6 @@ theorem reducedProduct_inclusion_mk {r s : ℚ≥0} (h : r ≤ s)
         (ReducedProduct.mapOnSequences (M.reducedBound s) (M.inclusion h) x) := by
   exact ReducedProduct.completedMap_mk _ _ _ _ x
 
-@[simp]
-theorem reducedProduct_zero (r : ℚ≥0) :
-    (M.reducedProduct).zero r = M.reducedConst r (M.zero r) :=
-  rfl
 
 @[simp]
 theorem reducedProduct_neg_mk (r : ℚ≥0)
@@ -211,29 +207,6 @@ theorem reducedProduct_smul_mk (q : ℚ) (r : ℚ≥0)
           (M.smul q r) x) := by
   exact ReducedProduct.completedMap_mk _ _ _ _ x
 
-@[simp]
-theorem reducedProduct_inclusion_const {r s : ℚ≥0} (h : r ≤ s) (x : M.Ball r) :
-    (M.reducedProduct).inclusion h (M.reducedConst r x) =
-      M.reducedConst s (M.inclusion h x) := by
-  exact reducedProduct_inclusion_mk M h (fun _ ↦ x)
-
-@[simp]
-theorem reducedProduct_neg_const (r : ℚ≥0) (x : M.Ball r) :
-    (M.reducedProduct).neg r (M.reducedConst r x) =
-      M.reducedConst r (M.neg r x) := by
-  exact reducedProduct_neg_mk M r (fun _ ↦ x)
-
-@[simp]
-theorem reducedProduct_add_const (r s : ℚ≥0) (x : M.Ball r) (y : M.Ball s) :
-    (M.reducedProduct).add r s (M.reducedConst r x, M.reducedConst s y) =
-      M.reducedConst (r + s) (M.add r s (x, y)) := by
-  exact reducedProduct_add_mk M r s (fun _ ↦ x) (fun _ ↦ y)
-
-@[simp]
-theorem reducedProduct_smul_const (q : ℚ) (r : ℚ≥0) (x : M.Ball r) :
-    (M.reducedProduct).smul q r (M.reducedConst r x) =
-      M.reducedConst (q.nnabs * r) (M.smul q r x) := by
-  exact reducedProduct_smul_mk M q r (fun _ ↦ x)
 
 end RationalBallSystem
 

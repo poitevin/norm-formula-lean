@@ -43,7 +43,7 @@ theorem halfGraphRow_bounded (i : ℕ) :
     ‖HalfGraph.xInY i‖ ≤
         Real.sqrt 3 * ‖(HalfGraph.xInY i).toHilbert‖ :=
       HalfGraph.Y.norm_le_sqrtThree_mul_hilbert_norm _
-    _ = Real.sqrt 3 := by simp [HalfGraph.xVector]
+    _ = Real.sqrt 3 := by simp [HalfGraph.xInY, HalfGraph.xVector]
 
 /-- The embedded parameter sequence lies in a fixed norm ball. -/
 theorem halfGraphParameter_bounded (j : ℕ) :
@@ -53,7 +53,7 @@ theorem halfGraphParameter_bounded (j : ℕ) :
     ‖HalfGraph.yInY j‖ ≤
         Real.sqrt 3 * ‖(HalfGraph.yInY j).toHilbert‖ :=
       HalfGraph.Y.norm_le_sqrtThree_mul_hilbert_norm _
-    _ = Real.sqrt 3 := by simp [HalfGraph.yVector]
+    _ = Real.sqrt 3 := by simp [HalfGraph.yInY, HalfGraph.yVector]
 
 /-- Taking the parameter limit first makes the half-graph converge successively to `√6`. -/
 theorem halfGraph_successiveLimit_sqrtSix :

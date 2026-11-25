@@ -66,15 +66,6 @@ def toHilbert (x : XSpace) : XHilbertSpace :=
 def ofHilbert (x : XHilbertSpace) : XSpace :=
   ⟨fun n ↦ (BlockSpace.linearEquivHilbert n).symm (x n), ofHilbert_mem x⟩
 
-@[simp]
-theorem toHilbert_apply (x : XSpace) (n : ℕ) :
-    toHilbert x n = (x n).toHilbert :=
-  rfl
-
-@[simp]
-theorem ofHilbert_apply (x : XHilbertSpace) (n : ℕ) :
-    ofHilbert x n = (BlockSpace.linearEquivHilbert n).symm (x n) :=
-  rfl
 
 /-- The algebraic equivalence between `XSpace` and its Hilbert `ℓ₂` model. -/
 def linearEquivHilbertSum : XSpace ≃ₗ[ℝ] XHilbertSpace where

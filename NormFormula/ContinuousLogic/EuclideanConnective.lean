@@ -22,11 +22,6 @@ def boundedEuclideanTruth (values : Fin 2 → TruthValue) : TruthValue :=
   ⟨min 1 (NormFormula.euclideanConnective (values 0) (values 1)),
     le_min (by norm_num) (Real.sqrt_nonneg _), min_le_left _ _⟩
 
-@[simp]
-theorem boundedEuclideanTruth_coe (values : Fin 2 → TruthValue) :
-    (boundedEuclideanTruth values : ℝ) =
-      min 1 (NormFormula.euclideanConnective (values 0) (values 1)) :=
-  rfl
 
 /-- The clipped Euclidean operation as a binary continuous-logic
 connective. -/
@@ -45,14 +40,6 @@ def boundedEuclideanConnective : Connective 2 where
         (hzero.prodMk hone)
     exact (continuous_const.min heuc).subtype_mk _
 
-/-- If the ordinary Euclidean value is already at most `1`, clipping is
-inactive. -/
-theorem boundedEuclideanConnective_eq_of_le_one
-    (values : Fin 2 → TruthValue)
-    (hvalues : NormFormula.euclideanConnective (values 0) (values 1) ≤ 1) :
-    ((boundedEuclideanConnective values : TruthValue) : ℝ) =
-      NormFormula.euclideanConnective (values 0) (values 1) := by
-  exact min_eq_right hvalues
 
 end
 

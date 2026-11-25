@@ -111,19 +111,6 @@ theorem orderedPairValue_mem_finiteQValues_of_support_subset
     · have hvj : v j = 0 := hB j hjB
       simp [finiteQValues, hui, hvj]
 
-/-- Exact supports are a special case of support containment. -/
-theorem orderedPairValue_mem_finiteQValues (u v : RealL2) (A B : Finset ℕ)
-    (hA : ∀ i, i ∈ A ↔ u i ≠ 0) (hB : ∀ j, j ∈ B ↔ v j ≠ 0)
-    {i j : ℕ} (hij : i < j) :
-    |u i + v j| ∈ finiteQValues u v A B := by
-  apply orderedPairValue_mem_finiteQValues_of_support_subset u v A B
-  · intro a ha
-    by_contra hua
-    exact ha ((hA a).2 hua)
-  · intro b hb
-    by_contra hvb
-    exact hb ((hB b).2 hvb)
-  · exact hij
 
 /-- A first-copy one-coordinate value is realized by an admissible pair,
 using a zero coordinate beyond the finite second support. -/
@@ -142,43 +129,6 @@ theorem firstOnlyValue_le_q (u v : RealL2) (B : Finset ℕ) (a : ℕ)
   have hvj : v j = 0 := hB j hjB
   simpa [hvj] using orderedPairValue_le_q u v haj
 
-/-- The finite list has a size bounded only by the two support sizes. -/
-theorem card_finiteQValues_le (u v : RealL2) (A B : Finset ℕ) :
-    (finiteQValues u v A B).card ≤
-      1 + A.card * B.card + A.card + B.card := by
-  classical
-  have hpair : (pairedQValues u v A B).card ≤ A.card * B.card := by
-    apply Finset.card_biUnion_le_card_mul A
-      (fun a ↦ (B.filter fun b ↦ a < b).image fun b ↦ |u a + v b|) B.card
-    intro a ha
-    exact Finset.card_image_le.trans (Finset.card_filter_le B (fun b ↦ a < b))
-  have hfirst : (firstOnlyQValues u A).card ≤ A.card := by
-    exact Finset.card_image_le
-  have hsecond : (secondOnlyQValues v A B).card ≤ B.card := by
-    exact Finset.card_image_le.trans
-      (Finset.card_filter_le B (fun b ↦ hasZeroBefore A b))
-  have hunionPF :
-      (pairedQValues u v A B ∪ firstOnlyQValues u A).card ≤
-        (pairedQValues u v A B).card + (firstOnlyQValues u A).card :=
-    Finset.card_union_le _ _
-  have hunionAll :
-      (pairedQValues u v A B ∪ firstOnlyQValues u A ∪
-        secondOnlyQValues v A B).card ≤
-      (pairedQValues u v A B ∪ firstOnlyQValues u A).card +
-        (secondOnlyQValues v A B).card :=
-    Finset.card_union_le _ _
-  unfold finiteQValues
-  calc
-    _ ≤ (pairedQValues u v A B ∪ firstOnlyQValues u A ∪
-        secondOnlyQValues v A B).card + 1 := Finset.card_insert_le _ _
-    _ ≤ ((pairedQValues u v A B ∪ firstOnlyQValues u A).card +
-        (secondOnlyQValues v A B).card) + 1 := by
-          exact Nat.add_le_add_right hunionAll 1
-    _ ≤ (((pairedQValues u v A B).card + (firstOnlyQValues u A).card) +
-        (secondOnlyQValues v A B).card) + 1 := by
-          exact Nat.add_le_add_right (Nat.add_le_add_right hunionPF _) 1
-    _ ≤ 1 + A.card * B.card + A.card + B.card := by
-          omega
 
 /-- The maximum formula is stable under cancellations: it is enough that
 `A` and `B` contain the supports. A vanishing candidate first coordinate
@@ -216,18 +166,5 @@ theorem qSeminorm_eq_max_finiteQValues_of_support_subset
       have hua : u a = 0 := hA a haA
       simpa [hua] using orderedPairValue_le_q u v hab
 
-/-- For exact finite supports `A` and `B`, the ordered-pair seminorm is the
-maximum of `finiteQValues`. -/
-theorem qSeminorm_eq_max_finiteQValues (u v : RealL2) (A B : Finset ℕ)
-    (hA : ∀ i, i ∈ A ↔ u i ≠ 0) (hB : ∀ j, j ∈ B ↔ v j ≠ 0) :
-    qSeminorm (WithLp.toLp 2 (u, v)) =
-      (finiteQValues u v A B).max' (finiteQValues_nonempty u v A B) := by
-  apply qSeminorm_eq_max_finiteQValues_of_support_subset u v A B
-  · intro a ha
-    by_contra hua
-    exact ha ((hA a).2 hua)
-  · intro b hb
-    by_contra hvb
-    exact hb ((hB b).2 hvb)
 
 end NormFormula.HalfGraph

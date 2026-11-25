@@ -30,12 +30,6 @@ theorem predicateFreeNormAddFormula_isNIPInCompleteTheory_mixed
   simpa [normPredicateTranslate] using
     normPredicateTranslate_isBoundedLocalNIP
 
-/-- The equal-radius form retained as a convenient compatibility wrapper. -/
-theorem predicateFreeNormAddFormula_isNIPInCompleteTheory
-    (radius : ℚ≥0) :
-    (predicateFreeNormAddFormula radius radius).IsNIPInCompleteTheory
-      (standardBanachBallStructure Y) :=
-  predicateFreeNormAddFormula_isNIPInCompleteTheory_mixed radius radius
 
 end
 

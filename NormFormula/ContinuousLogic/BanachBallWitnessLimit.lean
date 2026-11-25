@@ -127,18 +127,6 @@ def ambientLimitAssignment [Encodable Symbol]
     BallTerm.Assignment M.toRationalBallSystem context :=
   fun i ↦ initial.limitMap (context i) (indices i)
 
-/-- Interpreting a common-stage assignment gives exactly the ambient limit
-assignment. -/
-theorem indexMap_commonStage_eq_ambientLimitAssignment [Encodable Symbol]
-    (initial : BallWitnessIndexing M)
-    {n : ℕ} {context : BallContext n}
-    (indices : ∀ i : Fin n, initial.LimitIndex (context i)) :
-    (fun i ↦
-      (initial.iterate (initial.commonStage indices)).indexMap (context i)
-        (initial.limitAssignmentAtCommonStage indices i)) =
-      initial.ambientLimitAssignment indices := by
-  funext i
-  exact initial.indexMap_limitAssignmentAtCommonStage indices i
 
 end BallWitnessIndexing
 

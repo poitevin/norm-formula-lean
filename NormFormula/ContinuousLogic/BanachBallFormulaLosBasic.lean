@@ -112,32 +112,6 @@ inductive IsQuantifierFree :
       (hchildren : ∀ i, IsQuantifierFree (children i)) :
       IsQuantifierFree (.connective gate children)
 
-/-- Every quantifier-free typed ball formula satisfies the reduced-product
-Łoś equality. -/
-theorem IsQuantifierFree.hasReducedProductLos
-    {n : ℕ} {context : BallContext n}
-    {formula : BallFormula Symbol symbolRadius context}
-    (hformula : IsQuantifierFree formula) :
-    HasReducedProductLos M formula := by
-  induction hformula with
-  | distance left right => exact hasReducedProductLos_distance M left right
-  | predicate symbol term => exact hasReducedProductLos_predicate M symbol term
-  | constant value => exact hasReducedProductLos_constant M value
-  | connective gate children _ induction =>
-      exact hasReducedProductLos_connective M gate children induction
-
-/-- Public pointwise form of quantifier-free formula Łoś. -/
-@[simp]
-theorem realize_reducedProduct_of_quantifierFree
-    {n : ℕ} {context : BallContext n}
-    (formula : BallFormula Symbol symbolRadius context)
-    (hformula : IsQuantifierFree formula)
-    (assignment : BallTerm.ReducedAssignment M.toRationalBallSystem context) :
-    formula.realize M.reducedProduct
-        (BallTerm.completedAssignment M.toRationalBallSystem assignment) =
-      ultralimit fun k ↦ formula.realize M
-        (BallTerm.coordinateAssignment M.toRationalBallSystem assignment k) :=
-  hformula.hasReducedProductLos M assignment
 
 end BallFormula
 

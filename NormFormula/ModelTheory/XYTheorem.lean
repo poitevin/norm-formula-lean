@@ -3,7 +3,6 @@ import NormFormula.Analytic.XYUniformConvex
 import NormFormula.ContinuousLogic.XYLocalTypeNIP
 import NormFormula.ContinuousLogic.XYTheoryIP
 import NormFormula.Examples.XYInstability
-import NormFormula.ModelTheory.XYLocalNIP
 import NormFormula.ModelTheory.XYTheoryIP
 
 /-!
@@ -23,32 +22,6 @@ universe w
 
 open NormFormula.ContinuousLogic
 
-/-- The logical conclusions of the direct-sum corollary: the norm formula is
-unstable but NIP on the distinguished direct sum, while it has IP in the
-complete theory. -/
-theorem normFormula_unstable_nip_and_theoryIP
-    {SX : NormFormula.SequentialLocalNIPSemantics X.XSpace}
-    {SY : NormFormula.SequentialLocalNIPSemantics HalfGraph.Y}
-    {SXY : NormFormula.SequentialLocalNIPSemantics XYSpace}
-    {SIP : NormFormula.CompleteTheoryIPSemantics XYSpace XYSpace}
-    (PLocal : LocalNIPSumPresentation SX SY SXY)
-    (PIP : CompleteTheoryIPPresentation SIP)
-    (hx : SX.IsNIPOnDistinguished PLocal.xNormFormula)
-    (hy : SY.IsNIPOnDistinguished PLocal.yNormFormula) :
-    (¬ NormFormula.IsStableOnBounded
-      (fun x y ↦ SXY.formulaValue PLocal.xyNormFormula
-        x (PLocal.xyHomeParameter y))) ∧
-      SXY.IsNIPOnDistinguished PLocal.xyNormFormula ∧
-      SIP.IsIPInTheory PIP.normFormula := by
-  have hvalue :
-      (fun x y ↦ SXY.formulaValue PLocal.xyNormFormula
-        x (PLocal.xyHomeParameter y)) = normTranslate := by
-    funext x y
-    exact PLocal.xyNormFormula_value x y
-  refine ⟨?_, PLocal.normFormula_isNIPOnDistinguished hx hy,
-    PIP.normFormula_isIPInCompleteTheory⟩
-  intro hstable
-  exact normTranslate_not_isStableOnBounded (hstable.congr hvalue)
 
 /-- The logical direct-sum corollary in the concrete bounded-sorts continuous
 syntax, with no presentation or factor-NIP hypotheses: the norm formula is

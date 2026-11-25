@@ -18,19 +18,6 @@ element of the weak-star dual. -/
 def rieszWeakDual (x : H) : WeakDual ℝ H :=
   StrongDual.toWeakDual (InnerProductSpace.toDual ℝ H x)
 
-omit [SeparableSpace H] in
-@[simp]
-theorem rieszWeakDual_apply (x y : H) :
-    rieszWeakDual x y = inner ℝ x y :=
-  rfl
-
-omit [SeparableSpace H] in
-@[simp]
-theorem toStrongDual_rieszWeakDual (x : H) :
-    WeakDual.toStrongDual (rieszWeakDual x) =
-      InnerProductSpace.toDual ℝ H x := by
-  rfl
-
 /-- Every bounded sequence in the Hilbert model has a weakly convergent
 subsequence.  This is sequential Banach--Alaoglu transported through the
 Riesz representation theorem. -/

@@ -105,10 +105,6 @@ theorem fixedTypeTrace_mem_elementarySparseParameterTraces
 
 def elementarySparseTraceDegree (k : ℕ) : ℕ := k + elementaryExpressionCount k
 
-theorem elementarySparseTraceDegree_eq (k : ℕ) :
-    elementarySparseTraceDegree k = 2 * k + k.choose 2 := by
-  unfold elementarySparseTraceDegree elementaryExpressionCount
-  omega
 
 def elementarySparseTraceConstant (m k : ℕ) : ℕ :=
   (k + 1) * (orderTypeConstant k * (2 * (m + (m + k + 1)) + 1) ^ k *

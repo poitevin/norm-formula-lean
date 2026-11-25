@@ -186,45 +186,6 @@ theorem finiteAffineQValues_eq_finiteQValues {ℓ : ℕ}
     image_firstOnlyQForms_eq_firstOnlyQValues first u A t hfirst,
     image_secondOnlyQForms_eq_secondOnlyQValues second v A B t hsecond]
 
-/-- The fixed affine list has the same uniform size bound as the coordinate
-list, before any duplicate affine forms are removed. -/
-theorem card_finiteAffineQForms_le {ℓ : ℕ}
-    (first second : ℕ → AffineForm ℓ) (A B : Finset ℕ) :
-    (finiteAffineQForms first second A B).card ≤
-      1 + A.card * B.card + A.card + B.card := by
-  classical
-  have hpair : (pairedQForms first second A B).card ≤ A.card * B.card := by
-    apply Finset.card_biUnion_le_card_mul A
-      (fun a ↦ (B.filter fun b ↦ a < b).image fun b ↦
-        AffineForm.add (first a) (second b)) B.card
-    intro a ha
-    exact Finset.card_image_le.trans (Finset.card_filter_le B (fun b ↦ a < b))
-  have hfirst : (firstOnlyQForms first A).card ≤ A.card := Finset.card_image_le
-  have hsecond : (secondOnlyQForms second A B).card ≤ B.card := by
-    exact Finset.card_image_le.trans
-      (Finset.card_filter_le B (fun b ↦ hasZeroBefore A b))
-  have hunionPF :
-      (pairedQForms first second A B ∪ firstOnlyQForms first A).card ≤
-        (pairedQForms first second A B).card + (firstOnlyQForms first A).card :=
-    Finset.card_union_le _ _
-  have hunionAll :
-      (pairedQForms first second A B ∪ firstOnlyQForms first A ∪
-        secondOnlyQForms second A B).card ≤
-      (pairedQForms first second A B ∪ firstOnlyQForms first A).card +
-        (secondOnlyQForms second A B).card :=
-    Finset.card_union_le _ _
-  unfold finiteAffineQForms
-  calc
-    _ ≤ (pairedQForms first second A B ∪ firstOnlyQForms first A ∪
-        secondOnlyQForms second A B).card + 1 := Finset.card_insert_le _ _
-    _ ≤ ((pairedQForms first second A B ∪ firstOnlyQForms first A).card +
-        (secondOnlyQForms second A B).card) + 1 :=
-      Nat.add_le_add_right hunionAll 1
-    _ ≤ (((pairedQForms first second A B).card +
-        (firstOnlyQForms first A).card) +
-        (secondOnlyQForms second A B).card) + 1 :=
-      Nat.add_le_add_right (Nat.add_le_add_right hunionPF _) 1
-    _ ≤ 1 + A.card * B.card + A.card + B.card := by omega
 
 /-- On candidate supports, `q` is the maximum of a fixed finite list of
 absolute affine forms.  The support-containment assumptions make the result
@@ -355,25 +316,5 @@ theorem qSeminorm_eq_max_labelledAffineQValues {ℓ : ℕ}
   · intro b hb
     exact (hv b).symm
 
-/-- The fixed affine list for a row with supports `A₀,B₀` and `ℓ` labelled
-parameter coordinates has a size bounded only by those three numbers. -/
-theorem card_labelledAffineQForms_le {ℓ : ℕ}
-    (rowU rowV : RealL2) (A₀ B₀ : Finset ℕ)
-    (copy : Fin ℓ → CoordinateCopy) (index : Fin ℓ → ℕ) :
-    (finiteAffineQForms
-      (labelledCoordinateForm (fun i ↦ rowU i) copy index .first)
-      (labelledCoordinateForm (fun i ↦ rowV i) copy index .second)
-      (candidateSupport A₀ copy index .first)
-      (candidateSupport B₀ copy index .second)).card ≤
-      1 + (A₀.card + ℓ) * (B₀.card + ℓ) + (A₀.card + ℓ) + (B₀.card + ℓ) := by
-  have hforms := card_finiteAffineQForms_le
-    (labelledCoordinateForm (fun i ↦ rowU i) copy index .first)
-    (labelledCoordinateForm (fun i ↦ rowV i) copy index .second)
-    (candidateSupport A₀ copy index .first)
-    (candidateSupport B₀ copy index .second)
-  have hA := card_candidateSupport_le A₀ copy index .first
-  have hB := card_candidateSupport_le B₀ copy index .second
-  have hmul := Nat.mul_le_mul hA hB
-  omega
 
 end NormFormula.HalfGraph

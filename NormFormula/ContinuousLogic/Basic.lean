@@ -132,20 +132,6 @@ def SameCompleteTheory (M : Structure.{u, v}) (N : Structure.{u', v'}) : Prop :=
 
 namespace SameCompleteTheory
 
-theorem refl (M : Structure) : SameCompleteTheory M M := by
-  intro φ
-  rfl
-
-theorem symm {M N : Structure} (h : SameCompleteTheory M N) :
-    SameCompleteTheory N M := by
-  intro φ
-  exact (h φ).symm
-
-theorem trans {M N P : Structure}
-    (hMN : SameCompleteTheory M N) (hNP : SameCompleteTheory N P) :
-    SameCompleteTheory M P := by
-  intro φ
-  exact (hMN φ).trans (hNP φ)
 
 end SameCompleteTheory
 
@@ -173,13 +159,6 @@ def HasFiniteIPPatternsInEveryDimension
   ∀ n : ℕ, ∃ rows : Fin n → M.Row,
     IsIPPattern (fun i y ↦ φ.binaryValue M (rows i) y) low high
 
-/-- The exact compactness theorem required by this bounded fragment. This is
-a named proposition, not a Lean axiom; its atomic specialization is proved by
-the metric ultrapower in `ContinuousLogic.Compactness`. -/
-def FinitePatternCompactness (M : Structure.{u, v}) : Prop :=
-  ∀ (φ : Formula 1 1) (low high : ℝ), low < high →
-    HasFiniteIPPatternsInEveryDimension M φ low high →
-    HasIPInCompleteTheory M φ
 
 /-- The atomic-only compactness principle needed by the norm-formula
 application.  Keeping this smaller proposition separate makes the first
@@ -189,30 +168,6 @@ def AtomicFinitePatternCompactness (M : Structure.{u, v}) : Prop :=
     HasFiniteIPPatternsInEveryDimension M Formula.atomic low high →
     HasIPInCompleteTheory M Formula.atomic
 
-theorem FinitePatternCompactness.atomic {M : Structure.{u, v}}
-    (hcompact : FinitePatternCompactness M) :
-    AtomicFinitePatternCompactness M :=
-  hcompact Formula.atomic
-
-/-- Once continuous compactness is supplied for a bounded structure, its
-actual formula syntax and semantic theory-level IP instantiate the older
-syntax-free interface. -/
-def Structure.toCompleteTheoryIPSemantics
-    (M : Structure.{u, v}) [Norm M.Row] [Norm M.Parameter]
-    (hcompact : FinitePatternCompactness M) :
-    NormFormula.CompleteTheoryIPSemantics M.Row M.Parameter where
-  Formula := Formula 1 1
-  formulaValue := fun φ ↦ φ.binaryValue M
-  IsIPInTheory := HasIPInCompleteTheory M
-  finitePatternsToTheoryIP := by
-    intro φ R_x R_y low high hgap hpatterns
-    apply hcompact φ low high hgap
-    intro n
-    obtain ⟨rows, _, hip⟩ := hpatterns n
-    refine ⟨rows, ?_⟩
-    intro subset
-    obtain ⟨parameter, hin, hout⟩ := hip subset
-    exact ⟨parameter.1, hin, hout⟩
 
 end
 

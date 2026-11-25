@@ -55,13 +55,6 @@ def lpHead (s : Finset ι) (f : lp E 2) : lp E 2 :=
 def lpTail (s : Finset ι) (f : lp E 2) : lp E 2 :=
   f - lpHead s f
 
-@[simp]
-theorem lpHead_empty (f : lp E 2) : lpHead ∅ f = 0 := by
-  simp [lpHead]
-
-@[simp]
-theorem lpTail_empty (f : lp E 2) : lpTail ∅ f = f := by
-  simp [lpTail]
 
 /-- Finite heads respect addition. -/
 theorem lpHead_add (s : Finset ι) (u v : lp E 2) :
@@ -123,50 +116,6 @@ theorem normSqDefect_eq_sum_add_tail (s : Finset ι) (u v : lp E 2) :
   simp only [lp.coeFn_add, Pi.add_apply, Finset.sum_sub_distrib]
   ring
 
-/-- The universal defect estimate applied to two complementary tails. -/
-theorem abs_normSqDefect_lpTail_le (s : Finset ι) (u v : lp E 2) :
-    |normSqDefect (lpTail s u) (lpTail s v)| ≤
-      2 * ‖lpTail s u‖ * ‖lpTail s v‖ :=
-  abs_normSqDefect_le (lpTail s u) (lpTail s v)
-
-/-- A uniformly bounded second vector makes the tail defect arbitrarily small
-as the first vector's finite head exhausts its coordinates. -/
-theorem tendsto_normSqDefect_lpTail_zero (u : lp E 2) {v : Finset ι → lp E 2}
-    {C : ℝ} (hv : ∀ s, ‖lpTail s (v s)‖ ≤ C) :
-    Tendsto (fun s ↦ normSqDefect (lpTail s u) (lpTail s (v s)))
-      atTop (𝓝 0) := by
-  have hnonneg : 0 ≤ C := by
-    classical
-    simpa using le_trans (norm_nonneg (lpTail ∅ (v ∅))) (hv ∅)
-  have hbound : Tendsto (fun s : Finset ι ↦ (2 * C) * ‖lpTail s u‖)
-      atTop (𝓝 0) := by
-    simpa using tendsto_const_nhds.mul (tendsto_norm_lpTail_zero u)
-  have hneg : Tendsto (fun s : Finset ι ↦ -((2 * C) * ‖lpTail s u‖))
-      atTop (𝓝 0) := by
-    simpa using hbound.neg
-  apply tendsto_of_tendsto_of_tendsto_of_le_of_le' hneg hbound
-  · filter_upwards with s
-    have habs : |normSqDefect (lpTail s u) (lpTail s (v s))| ≤
-        (2 * C) * ‖lpTail s u‖ := by
-      calc
-        |normSqDefect (lpTail s u) (lpTail s (v s))| ≤
-            2 * ‖lpTail s u‖ * ‖lpTail s (v s)‖ :=
-          abs_normSqDefect_le (lpTail s u) (lpTail s (v s))
-        _ ≤ 2 * ‖lpTail s u‖ * C :=
-          mul_le_mul_of_nonneg_left (hv s) (by positivity)
-        _ = (2 * C) * ‖lpTail s u‖ := by ring
-    exact le_trans (neg_le_neg habs) (neg_abs_le _)
-  · filter_upwards with s
-    have habs : |normSqDefect (lpTail s u) (lpTail s (v s))| ≤
-        (2 * C) * ‖lpTail s u‖ := by
-      calc
-        |normSqDefect (lpTail s u) (lpTail s (v s))| ≤
-            2 * ‖lpTail s u‖ * ‖lpTail s (v s)‖ :=
-          abs_normSqDefect_le (lpTail s u) (lpTail s (v s))
-        _ ≤ 2 * ‖lpTail s u‖ * C :=
-          mul_le_mul_of_nonneg_left (hv s) (by positivity)
-        _ = (2 * C) * ‖lpTail s u‖ := by ring
-    exact le_trans (le_abs_self _) habs
 
 end L2Sum
 

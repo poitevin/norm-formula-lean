@@ -1,6 +1,6 @@
 import NormFormula.Analytic.Separability
 import NormFormula.ContinuousLogic.NormAddLocalType
-import NormFormula.ModelTheory.XNormSequential
+import NormFormula.ModelTheory.XStability
 
 /-!
 # Local-type NIP for the bounded norm formula on `X`

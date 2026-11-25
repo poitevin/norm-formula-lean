@@ -32,10 +32,6 @@ def c0Basis (i : ℕ) : C0Space :=
     intro j hj
     exact lp.single_apply_ne ∞ i 1 (by omega)⟩
 
-@[simp]
-theorem c0Basis_apply_self (i : ℕ) :
-    (c0Basis i : BoundedScalarSequences) i = 1 :=
-  lp.single_apply_self ∞ i 1
 
 @[simp]
 theorem norm_c0Basis (i : ℕ) : ‖c0Basis i‖ = 1 := by

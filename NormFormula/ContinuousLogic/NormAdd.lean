@@ -33,11 +33,6 @@ def normAddTruth (R : ℝ) (hR : 0 < R)
     _ ≤ R + R := add_le_add x.2 y.2
     _ = 2 * R := by ring
 
-@[simp]
-theorem normAddTruth_coe (R : ℝ) (hR : 0 < R)
-    (x y : PositiveNormBall E R) :
-    ((normAddTruth R hR x y : TruthValue) : ℝ) = ‖x.1 + y.1‖ / (2 * R) :=
-  rfl
 
 /-- Uniform continuity of normalized norm addition. -/
 theorem normAddTruth_uniformContinuous (R : ℝ) (hR : 0 < R) :
@@ -65,12 +60,6 @@ def normAddStructure (R : ℝ) (hR : 0 < R) : Structure where
   predicate := normAddTruth R hR
   predicate_uniformContinuous := normAddTruth_uniformContinuous R hR
 
-@[simp]
-theorem normAddStructure_atomic_value (R : ℝ) (hR : 0 < R)
-    (x y : PositiveNormBall E R) :
-    Formula.atomic.binaryValue (normAddStructure (E := E) R hR) x y =
-      ‖x.1 + y.1‖ / (2 * R) :=
-  rfl
 
 /-- The one-symbol language used for normalized norm addition on arbitrary
 positive norm balls. -/

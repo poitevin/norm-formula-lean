@@ -53,15 +53,6 @@ theorem largeCoordinates_ncard_mul_sq_le_norm_sq (u : RealL2) {η : ℝ} (hη : 
       rw [Set.ncard_eq_toFinset_card _ hfinite]
     _ ≤ ‖u‖ ^ 2 := hlower.trans hupper
 
-/-- The explicit floor bound for one copy of `ℓ₂`. -/
-theorem largeCoordinates_ncard_le_floor (u : RealL2) {C η : ℝ}
-    (hu : ‖u‖ ≤ C) (hη : 0 < η) :
-    (largeCoordinates u η).ncard ≤ ⌊C ^ 2 / η ^ 2⌋₊ := by
-  have hC : 0 ≤ C := (norm_nonneg u).trans hu
-  rw [Nat.le_floor_iff (div_nonneg (sq_nonneg C) (sq_nonneg η))]
-  apply (le_div_iff₀ (sq_pos_of_pos hη)).2
-  exact (largeCoordinates_ncard_mul_sq_le_norm_sq u hη).trans
-    ((sq_le_sq₀ (norm_nonneg u) hC).2 hu)
 
 /-- The number of coordinates retained across both copies of `ℓ₂`. -/
 noncomputable def pairLargeCoordinateCount (z : HilbertSpace) (η : ℝ) : ℕ :=

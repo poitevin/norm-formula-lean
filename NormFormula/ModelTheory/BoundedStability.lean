@@ -32,14 +32,6 @@ def IsStableOnBounded {X Y : Type*} [Norm X] [Norm Y]
     HasSuccessiveLimit (fun n m ↦ value (xSeq m) (ySeq n)) secondLimit →
     firstLimit = secondLimit
 
-/-- Stability on bounded sets depends only on the pointwise interpretation of
-the binary function. -/
-theorem IsStableOnBounded.congr
-    {X Y : Type*} [Norm X] [Norm Y] {value value' : X → Y → ℝ}
-    (hstable : IsStableOnBounded value) (hvalue : value = value') :
-    IsStableOnBounded value' := by
-  subst value'
-  exact hstable
 
 /-- Pulling a stable function back along norm-nonincreasing maps preserves
 stability on bounded sets. -/

@@ -59,17 +59,6 @@ def parallelogramDiscrepancyTruth (r : ℚ≥0)
       sq_nonneg (rationalBallMetricBound r),
       sq_nonneg (rationalBallMetricBound (r + r))]
 
-@[simp]
-theorem parallelogramDiscrepancyTruth_coe (r : ℚ≥0)
-    (values : Fin 4 → TruthValue) :
-    (parallelogramDiscrepancyTruth r values : ℝ) =
-      |rationalBallMetricBound (r + r) ^ 2 *
-          ((values 0 : ℝ) ^ 2 + (values 1 : ℝ) ^ 2) -
-        2 * rationalBallMetricBound r ^ 2 *
-          ((values 2 : ℝ) ^ 2 + (values 3 : ℝ) ^ 2)| /
-        (2 * rationalBallMetricBound (r + r) ^ 2 +
-          4 * rationalBallMetricBound r ^ 2) :=
-  rfl
 
 /-- The radius-aware parallelogram discrepancy as a continuous connective. -/
 def parallelogramDiscrepancyConnective (r : ℚ≥0) : Connective 4 where
@@ -176,12 +165,6 @@ def midpointViolationTruth (values : Fin 2 → TruthValue) : TruthValue := by
     dsimp [expression]
     nlinarith [sq_nonneg (values 0 : ℝ), sq_nonneg (values 1 : ℝ)]
 
-@[simp]
-theorem midpointViolationTruth_coe (values : Fin 2 → TruthValue) :
-    (midpointViolationTruth values : ℝ) =
-      max 0 (4 * (values 0 : ℝ) ^ 2 +
-        (4 / 3 : ℝ) * (values 1 : ℝ) ^ 2 - 1) / (16 / 3 : ℝ) :=
-  rfl
 
 /-- The typed unit-ball midpoint violation as a continuous connective. -/
 def midpointViolationConnective : Connective 2 where

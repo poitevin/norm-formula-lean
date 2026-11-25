@@ -201,21 +201,5 @@ theorem card_sparseOrderType (D : Finset ℕ) (ℓ : ℕ) :
   rw [← pow_mul]
   ring
 
-/-- Consequently, a linear bound on `|D|` gives a polynomial order-type
-bound of degree `ℓ`. -/
-theorem card_sparseOrderType_le (D : Finset ℕ) (ℓ B : ℕ) (hD : D.card ≤ B) :
-    Fintype.card (SparseOrderType D ℓ) ≤
-      orderTypeConstant ℓ * (2 * B + 1) ^ ℓ := by
-  rw [card_sparseOrderType]
-  exact Nat.mul_le_mul_left _ (pow_le_pow_left' (by omega) ℓ)
-
-/-- Substituting the sparse-row union bound gives the polynomial estimate in
-the number of rows. -/
-theorem card_sparseOrderType_protectedRow_le {ι : Type*} [Fintype ι]
-    (support : ι → Finset ℕ) (m r ℓ : ℕ) (hsupport : ∀ i, (support i).card ≤ m) :
-    Fintype.card (SparseOrderType (protectedIndexSet (rowIndexSet support) r) ℓ) ≤
-      orderTypeConstant ℓ * (2 * (Fintype.card ι * m + r) + 1) ^ ℓ := by
-  exact card_sparseOrderType_le _ ℓ _
-    (card_protectedRowIndexSet_le support m r hsupport)
 
 end NormFormula.HalfGraph

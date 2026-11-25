@@ -434,39 +434,6 @@ theorem symbolicAffineQForms_eq_of_sparseOrderType_eq
     symbolicFirstOnlyQForms_eq_of_sparseOrderType_eq rowU h hAD hrowU,
     symbolicSecondOnlyQForms_eq_of_sparseOrderType_eq rowV h hBD hrowV hsize hprotected]
 
-/-- Consequently, absolute evaluation of the symbolic list is also invariant
-inside a sparse order type. -/
-theorem symbolicAffineQValues_eq_of_sparseOrderType_eq
-    {D A₀ B₀ : Finset ℕ} {ℓ s : ℕ} (rowU rowV : ℕ → ℝ)
-    {copy copy' : Fin ℓ → CoordinateCopy} {index index' : Fin ℓ → ℕ}
-    (h : sparseOrderType D copy index = sparseOrderType D copy' index')
-    (hAD : A₀ ⊆ D) (hBD : B₀ ⊆ D)
-    (hrowU : ∀ n, n ∉ A₀ → rowU n = 0)
-    (hrowV : ∀ n, n ∉ B₀ → rowV n = 0)
-    (hsize : A₀.card + ℓ ≤ s) (hprotected : Finset.range (s + 1) ⊆ D)
-    (t : Fin ℓ → ℝ) :
-    symbolicAffineQValues rowU rowV A₀ B₀ copy index t =
-      symbolicAffineQValues rowU rowV A₀ B₀ copy' index' t := by
-  rw [symbolicAffineQValues, symbolicAffineQValues,
-    symbolicAffineQForms_eq_of_sparseOrderType_eq rowU rowV h hAD hBD hrowU hrowV
-      hsize hprotected]
-
-/-- Uniform bound for the number of symbolic affine entries. -/
-theorem card_symbolicAffineQForms_le {ℓ : ℕ}
-    (rowU rowV : ℕ → ℝ) (A₀ B₀ : Finset ℕ)
-    (copy : Fin ℓ → CoordinateCopy) (index : Fin ℓ → ℕ) :
-    (symbolicAffineQForms rowU rowV A₀ B₀ copy index).card ≤
-      1 + (A₀.card + ℓ) * (B₀.card + ℓ) + (A₀.card + ℓ) + (B₀.card + ℓ) := by
-  rw [symbolicAffineQForms_eq_finiteAffineQForms]
-  have hforms := card_finiteAffineQForms_le
-    (labelledCoordinateForm rowU copy index .first)
-    (labelledCoordinateForm rowV copy index .second)
-    (candidateSupport A₀ copy index .first)
-    (candidateSupport B₀ copy index .second)
-  have hA := card_candidateSupport_le A₀ copy index .first
-  have hB := card_candidateSupport_le B₀ copy index .second
-  have hmul := Nat.mul_le_mul hA hB
-  omega
 
 /-- For a fixed row and labelled sparse parameter, `q` is the maximum of the
 absolute evaluations of the symbolic affine list. -/

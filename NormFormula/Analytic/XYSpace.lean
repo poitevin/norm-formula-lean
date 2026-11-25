@@ -26,17 +26,6 @@ noncomputable def inX (x : X.XSpace) : XYSpace :=
 noncomputable def inY (y : HalfGraph.Y) : XYSpace :=
   WithLp.toLp 2 (0, y)
 
-@[simp]
-theorem inX_fst (x : X.XSpace) : (inX x).fst = x := rfl
-
-@[simp]
-theorem inX_snd (x : X.XSpace) : (inX x).snd = 0 := rfl
-
-@[simp]
-theorem inY_fst (y : HalfGraph.Y) : (inY y).fst = 0 := rfl
-
-@[simp]
-theorem inY_snd (y : HalfGraph.Y) : (inY y).snd = y := rfl
 
 /-- The first coordinate embedding is isometric. -/
 @[simp]

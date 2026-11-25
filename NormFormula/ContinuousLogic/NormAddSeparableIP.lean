@@ -1,6 +1,5 @@
 import NormFormula.ContinuousLogic.NormAdd
 import NormFormula.ContinuousLogic.MultiCompactness
-import NormFormula.ContinuousLogic.SeparableElementaryIP
 
 /-!
 # Separable elementary norm-predicate models
@@ -80,55 +79,6 @@ theorem normAddMulti_hasFinitePatterns_of_raw_patterns
     exact (div_le_div_iff_of_pos_right (by positivity : 0 < 2 * R)).2
       (hout i hi)
 
-/-- Raw finite patterns yield a same-theory norm-predicate model with one
-infinite witness at the exact normalized thresholds. -/
-theorem exists_sameTheory_normAddInfiniteWitness_of_patterns
-    (R_x R_y low high : ℝ)
-    (hpatterns : NormFormula.HasIPPatternsInEveryDimension
-      (fun x y : E => ‖x + y‖) R_x R_y low high) :
-    let R := 1 + |R_x| + |R_y|
-    ∃ N : MultiStructure.{u, u} NormAddSymbol,
-      MultiSameCompleteTheory
-        (normAddMultiStructure (E := E) R (by positivity)) N ∧
-      MultiFormula.HasInfiniteIPWitness N normAddMultiFormula
-        (low / (2 * R)) (high / (2 * R)) := by
-  dsimp only
-  let R := 1 + |R_x| + |R_y|
-  have hR : 0 < R := by
-    dsimp [R]
-    positivity
-  exact MultiFormula.exists_sameTheory_atomic_infiniteWitness_of_finitePatterns
-    (normAddMultiStructure (E := E) R hR)
-    (normAddMultiStructureBounds R hR) .norm
-    (low / (2 * R)) (high / (2 * R))
-    (by simpa [normAddMultiFormula] using
-      (normAddMulti_hasFinitePatterns_of_raw_patterns
-        (E := E) R_x R_y low high hpatterns))
-
-/-- Raw norm patterns therefore have a separable same-theory
-`NormAddSymbol` model retaining the exact normalized infinite witness. -/
-theorem exists_separableNormAddIPModel_of_patterns
-    (R_x R_y low high : ℝ)
-    (hpatterns : NormFormula.HasIPPatternsInEveryDimension
-      (fun x y : E => ‖x + y‖) R_x R_y low high) :
-    let R := 1 + |R_x| + |R_y|
-    ∃ N : MultiStructure.{u, u} NormAddSymbol,
-      MultiSameCompleteTheory
-        (normAddMultiStructure (E := E) R (by positivity)) N ∧
-      IsSeparable (Set.univ : Set N.Row) ∧
-      IsSeparable (Set.univ : Set N.Parameter) ∧
-      MultiFormula.HasInfiniteIPWitness N normAddMultiFormula
-        (low / (2 * R)) (high / (2 * R)) := by
-  dsimp only
-  let R := 1 + |R_x| + |R_y|
-  obtain ⟨ambient, hAmbientTheory, hAmbientWitness⟩ :=
-    exists_sameTheory_normAddInfiniteWitness_of_patterns
-      (E := E) R_x R_y low high hpatterns
-  obtain ⟨target, hTargetTheory, hRowSeparable, hParameterSeparable,
-    hTargetWitness⟩ :=
-      MultiFormula.exists_separableElementaryIPSubstructure hAmbientWitness
-  exact ⟨target, hAmbientTheory.trans hTargetTheory, hRowSeparable,
-    hParameterSeparable, hTargetWitness⟩
 
 end
 

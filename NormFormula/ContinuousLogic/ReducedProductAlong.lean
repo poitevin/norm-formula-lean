@@ -40,9 +40,6 @@ instance [Nonempty α] : Nonempty (ReducedSequenceAlong U B) :=
 def sequenceDist (x y : ReducedSequenceAlong U B) : ℝ :=
   (ultralimitAlong U fun i ↦ B.normalizedDistance (x i) (y i) : ℝ)
 
-theorem sequenceDist_nonneg (x y : ReducedSequenceAlong U B) :
-    0 ≤ sequenceDist U B x y :=
-  (ultralimitAlong U fun i ↦ B.normalizedDistance (x i) (y i)).property.1
 
 @[simp]
 theorem sequenceDist_self (x : ReducedSequenceAlong U B) :
@@ -77,10 +74,6 @@ instance pseudoMetricSpace : PseudoMetricSpace (ReducedSequenceAlong U B) where
   dist_comm := sequenceDist_comm U B
   dist_triangle := sequenceDist_triangle U B
 
-@[simp]
-theorem dist_eq_sequenceDist (x y : ReducedSequenceAlong U B) :
-    dist x y = sequenceDist U B x y :=
-  rfl
 
 /-- Normalized coordinate distances converge to the reduced distance. -/
 theorem tendsto_normalizedDistance (x y : ReducedSequenceAlong U B) :
@@ -128,15 +121,6 @@ variable {ι : Type κ} (U : Ultrafilter ι)
 def mk (x : ReducedSequenceAlong U B) : ReducedProductAlong U B :=
   SeparationQuotient.mk x
 
-/-- Diagonal element represented by a constant family. -/
-def const (x : α) : ReducedProductAlong U B :=
-  mk U B (fun _ ↦ x)
-
-@[simp]
-theorem dist_mk (x y : ReducedSequenceAlong U B) :
-    dist (mk U B x) (mk U B y) =
-      ReducedSequenceAlong.sequenceDist U B x y :=
-  SeparationQuotient.dist_mk x y
 
 end ReducedProductAlong
 

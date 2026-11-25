@@ -96,27 +96,6 @@ theorem not_containsIsomorphicCopyOfC0
     (Real.sqrt_pos.2 (by norm_num))
     M.norm_continuousLinearEquivHilbert_symm_le
 
-/-- Assumption-free final assembly for the public separable Hilbertian IP
-model.  Every geometric component is constructed from `model`; only
-separability and the retained norm-addition witness are stored fields. -/
-theorem has_all_geometric_conclusions
-    (M : SeparableHilbertianNormAddIPModel) :
-    SeparableSpace M.model.CompletedDirectedPoint ∧
-      SeparableSpace M.model.AuxiliaryHilbertCarrier ∧
-      M.model.HasCompletedNormAddWitness
-        4 (Real.sqrt 3) (Real.sqrt 6) ∧
-      (∀ x y : M.model.CompletedDirectedPoint,
-        ‖x‖ ≤ 1 → ‖y‖ ≤ 1 →
-          ‖(1 / 2 : ℝ) • (x + y)‖ ^ 2 ≤
-            1 - (1 / 12 : ℝ) * ‖x - y‖ ^ 2) ∧
-      UniformConvexSpace M.model.CompletedDirectedPoint ∧
-      M.IsSqrtThreeIsomorphicToHilbert ∧
-      ¬ NormFormula.ContainsIsomorphicCopyOfC0
-        M.model.CompletedDirectedPoint := by
-  exact ⟨M.completedSeparable, M.auxiliaryHilbertSeparable,
-    M.normAddWitness, M.norm_midpoint_sq_le, M.uniformConvexSpace,
-    M.isSqrtThreeIsomorphicToHilbert,
-    M.not_containsIsomorphicCopyOfC0⟩
 
 end SeparableHilbertianNormAddIPModel
 

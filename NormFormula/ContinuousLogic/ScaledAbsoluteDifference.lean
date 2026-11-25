@@ -28,13 +28,6 @@ def scaledAbsoluteDifferenceTruth (c : ℝ) (hc : 0 ≤ c) (hcle : c ≤ 1)
   rw [abs_le]
   constructor <;> linarith [(values 0).2.1, (values 0).2.2]
 
-@[simp]
-theorem scaledAbsoluteDifferenceTruth_coe
-    (c : ℝ) (hc : 0 ≤ c) (hcle : c ≤ 1)
-    (values : Fin 2 → TruthValue) :
-    (scaledAbsoluteDifferenceTruth c hc hcle values : ℝ) =
-      |(values 0 : ℝ) - c * (values 1 : ℝ)| :=
-  rfl
 
 /-- Scaled absolute difference as a binary continuous connective. -/
 def scaledAbsoluteDifferenceConnective

@@ -2,7 +2,6 @@ import NormFormula.ContinuousLogic.BanachBallCompactness
 import NormFormula.ContinuousLogic.BanachBallSeparableIP
 import NormFormula.Analytic.Separability
 import NormFormula.ContinuousLogic.XHilbertBallDirectedUnion
-import NormFormula.ContinuousLogic.XHilbertBallReductGeometry
 import NormFormula.Examples.XIPPattern
 
 /-!
@@ -40,11 +39,6 @@ theorem normAddBallFormula_value
   rw [BallTerm.binaryAddTerm_standardValue]
   norm_num [rationalBallMetricBound]
 
-/-- The old fixed gap remains positive after the radius-`4` truth-value
-normalization. -/
-theorem normalizedSqrtThree_lt_normalizedSqrtSix :
-    Real.sqrt 3 / 8 < Real.sqrt 6 / 8 :=
-  div_lt_div_of_pos_right sqrtThree_lt_sqrtSix (by norm_num)
 
 /-- In every same-theory ball model, the normalized norm-addition formula is
 exactly the reconstructed distance of the sum from zero, divided by the
@@ -254,15 +248,6 @@ theorem normAddBallFormula_hasFiniteIPPatternsInEveryDimension :
     rw [BallFormula.binaryValue, normAddBallFormula_value]
     exact div_le_div_of_nonneg_right h (by norm_num)
 
-/-- The typed norm-addition formula has IP in the full complete theory of the
-expanded rational-ball structure.  The witness lives in the completed ball
-reduced product constructed by the unconditional compactness theorem. -/
-theorem normAddBallFormula_hasIPInCompleteTheory :
-    normAddBallFormula.HasIPInCompleteTheory expansionStructure :=
-  BallFormula.finitePatternCompactness expansionStructure normAddBallFormula
-    (Real.sqrt 3 / 8) (Real.sqrt 6 / 8)
-    normalizedSqrtThree_lt_normalizedSqrtSix
-    normAddBallFormula_hasFiniteIPPatternsInEveryDimension
 
 /-- The retained copy of the original expanded `X` in the typed model.
 The sort maps preserve terms and all formula values on original tuples. -/
@@ -327,77 +312,6 @@ theorem exists_sortwiseSeparable_normAddIPModel_with_copy :
     exact (initial.ballFormula_realize_limitBallStructure_eq_ambient formula
       (fun i ↦ copy (context i) (assignment i))).trans
       (formula.realize_reducedConst expansionStructure assignment)
-
-/-- The fixed normalized norm-addition patterns admit a same-complete-theory
-expanded ball model whose every rational-radius sort is separable and which
-retains an infinite witness at the exact gap `√3/8 < √6/8`. -/
-theorem exists_sortwiseSeparable_normAddIPModel :
-    ∃ N : BallStructure.{0, 0} PredicateSymbol predicateRadius,
-      BallSameCompleteTheory expansionStructure N ∧
-      (∀ radius : ℚ≥0,
-        IsSeparable (Set.univ : Set (N.Ball radius))) ∧
-      normAddBallFormula.HasInfiniteIPWitness N
-        (Real.sqrt 3 / 8) (Real.sqrt 6 / 8) := by
-  obtain ⟨A, _, hseparable, hIP⟩ := exists_sortwiseSeparable_normAddIPModel_with_copy
-  exact ⟨A.model, A.sameCompleteTheory, hseparable, hIP⟩
-
-/-- The sortwise-separable same-theory witness has a separable complete
-one-sorted rational module reconstruction.  This packages the first direct
-bridge from continuous downward Löwenheim--Skolem to the ordinary completed
-directed union. -/
-theorem exists_separableCompletedDirectedPoint_normAddIPModel :
-    ∃ A : XBallTheoryModel.{0},
-      (∀ radius : ℚ≥0,
-        IsSeparable (Set.univ : Set (A.model.Ball radius))) ∧
-      normAddBallFormula.HasInfiniteIPWitness A.model
-        (Real.sqrt 3 / 8) (Real.sqrt 6 / 8) ∧
-      SeparableSpace A.CompletedDirectedPoint := by
-  obtain ⟨N, hTheory, hseparable, hIP⟩ :=
-    exists_sortwiseSeparable_normAddIPModel
-  let A : XBallTheoryModel.{0} := ⟨N, hTheory⟩
-  refine ⟨A, hseparable, hIP, ?_⟩
-  exact A.completedDirectedPoint_separableSpace hseparable
-
-/-- Consequently there is a separable complete reconstructed rational module
-with a fixed-ball infinite distance-addition witness at the paper's original
-unnormalized gap `√3 < √6`. -/
-theorem exists_separableCompleted_normAddDistanceIPModel :
-    ∃ A : XBallTheoryModel.{0},
-      (∀ radius : ℚ≥0,
-        IsSeparable (Set.univ : Set (A.model.Ball radius))) ∧
-      SeparableSpace A.CompletedDirectedPoint ∧
-      A.HasCompletedDistanceAddWitness 4 (Real.sqrt 3) (Real.sqrt 6) := by
-  obtain ⟨A, hseparable, hIP, hcompletedSeparable⟩ :=
-    exists_separableCompletedDirectedPoint_normAddIPModel
-  have hwitness := normAddBallFormula_hasCompletedDistanceAddWitness A hIP
-  refine ⟨A, hseparable, hcompletedSeparable, ?_⟩
-  convert hwitness using 1 <;> norm_num [rationalBallMetricBound] <;> ring
-
-/-- The same model therefore carries the paper's literal fixed-ball
-norm-addition witness at `√3 < √6`. -/
-theorem exists_separableCompleted_normAddIPModel :
-    ∃ A : XBallTheoryModel.{0},
-      (∀ radius : ℚ≥0,
-        IsSeparable (Set.univ : Set (A.model.Ball radius))) ∧
-      SeparableSpace A.CompletedDirectedPoint ∧
-      A.HasCompletedNormAddWitness 4 (Real.sqrt 3) (Real.sqrt 6) := by
-  obtain ⟨A, hseparable, hcompletedSeparable, hwitness⟩ :=
-    exists_separableCompleted_normAddDistanceIPModel
-  exact ⟨A, hseparable, hcompletedSeparable,
-    (A.hasCompletedDistanceAddWitness_iff_norm 4
-      (Real.sqrt 3) (Real.sqrt 6)).mp hwitness⟩
-
-/-- There is an unconditional separable real Banach reconstruction carrying
-the paper's fixed-ball norm-addition IP witness.  The real `NormedSpace`
-structure and completeness are canonical instances on
-`A.CompletedDirectedPoint`. -/
-theorem exists_separableRealBanach_normAddIPModel :
-    ∃ A : XBallTheoryModel.{0},
-      (∀ radius : ℚ≥0,
-        IsSeparable (Set.univ : Set (A.model.Ball radius))) ∧
-      SeparableSpace A.CompletedDirectedPoint ∧
-      A.HasCompletedNormAddWitness 4 (Real.sqrt 3) (Real.sqrt 6) :=
-  exists_separableCompleted_normAddIPModel
 
 /-- The unconditional reconstruction packaged together with its constructed
 separable auxiliary Hilbert space. The bundle records the elementary copy
